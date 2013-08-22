@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="nl.simbits.rambler"
+      android:versionCode="1"
+      android:versionName="1.0"
+      android:debuggable="true" >
+
+    <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="10"/>
+
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" /> 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application android:label="@string/app_name" 
+                 android:icon="@drawable/icon" 
+                 android:name=".RamblerApplication">
+
+        <activity android:name="Rambler"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".PrefsActivity"
+                  android.label="@string/titlePrefs" />
+  
+        <activity android:name=".ShoeTabActivity" />
+        <activity android:name=".MainTabActivity" />
+        <activity android:name=".TwitterPrefsActivity" />
+        <activity android:name=".MapTabActivity" />
+        <activity android:name=".BluetoothUtilities" />
+
+        <activity android:name=".BluetoothDevicesDialog"
+                  android:label="select device"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
+  
+          <!--<activity android:name=".TwitterOAuthActivity" android:launchMode="singleTask" >-->
+        <activity android:name=".TwitterOAuthActivity" >
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+			</intent-filter>
+		</activity>
+
+        <service android:name=".RamblerService" />
+    </application>
+</manifest> 

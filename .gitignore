@@ -1,6 +1,11 @@
+latest_build
+build
+gen
+bin
+.dep
+.DS_Store
+.*.swp
+*.o
+*.lst
+*.map
 *.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
