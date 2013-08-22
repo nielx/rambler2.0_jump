@@ -22,7 +22,7 @@ public class FacebookUtilities extends AsyncFacebookRunner
 {
 
     public static final String TAG = "FacebookUtilities";
-	public static final int AUTHORIZE_ACTIVITY_RESULT_CODE = 00000; /* Auth result code here */
+	public static final int AUTHORIZE_ACTIVITY_RESULT_CODE = 12345; /* Auth result code here */
 
     private static final String SP_TOKEN = "access_token";
     private static final String SP_EXPIRES = "expires_in";

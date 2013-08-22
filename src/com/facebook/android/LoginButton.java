@@ -65,8 +65,8 @@ public class LoginButton extends ImageButton {
         
         setBackgroundColor(Color.TRANSPARENT);
         setImageResource(fb.isSessionValid() ?
-                         R.drawable.fb_logout_button : 
-                         R.drawable.fb_login_button);
+                         nl.simbits.rambler.R.drawable.fb_logout_button : 
+                         nl.simbits.rambler.R.drawable.fb_login_button);
         drawableStateChanged();
         
         SessionEvents.addAuthListener(mSessionListener);
@@ -125,7 +125,7 @@ public class LoginButton extends ImageButton {
     private class SessionListener implements AuthListener, LogoutListener {
         
         public void onAuthSucceed() {
-            setImageResource(R.drawable.fb_logout_button);
+            setImageResource(nl.simbits.rambler.R.drawable.fb_logout_button);
             SessionStore.save(mFb, getContext());
         }
 
@@ -137,7 +137,7 @@ public class LoginButton extends ImageButton {
         
         public void onLogoutFinish() {
             SessionStore.clear(getContext());
-            setImageResource(R.drawable.fb_login_button);
+            setImageResource(nl.simbits.rambler.R.drawable.fb_login_button);
         }
     }
     
