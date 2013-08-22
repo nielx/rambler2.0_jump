@@ -34,7 +34,6 @@
         <activity android:name=".MainTabActivity" />
         <activity android:name=".TwitterPrefsActivity" />
         <activity android:name=".MapTabActivity" />
-        <activity android:name=".BluetoothUtilities" />
 
         <activity android:name=".BluetoothDevicesDialog"
                   android:label="select device"
