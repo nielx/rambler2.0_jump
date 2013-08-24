@@ -26,7 +26,7 @@ public class TwitterPrefsActivity extends Activity {
         TwitterSessionEvents.addAuthListener(mSessionListener);
         TwitterSessionEvents.addLogoutListener(mSessionListener);
         mLoginButton = (TwitterLoginButton)findViewById(R.id.twitterLoginButton);
-        mLoginButton.init(this, TwitterUtilities.AUTHORIZE_ACTIVITY_RESULT_CODE);
+        mLoginButton.init(this, Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE);
 
         requestScreenName();
     }
@@ -52,7 +52,7 @@ public class TwitterPrefsActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch(requestCode) {
-            case TwitterUtilities.AUTHORIZE_ACTIVITY_RESULT_CODE: {
+            case Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE: {
                 TwitterUtilities.authorizeCallback(requestCode, resultCode, data, mPrefs);
                 break;
             }

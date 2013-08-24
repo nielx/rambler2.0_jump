@@ -3,6 +3,7 @@ package nl.simbits.rambler;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 import android.util.Log;
 
 import twitter4j.auth.AccessToken;
@@ -26,19 +27,13 @@ public class TwitterUtilities
 {
     public static final String TAG = "TwitterUtilities";
 
-	public static final int AUTHORIZE_ACTIVITY_RESULT_CODE = 00000;  /* Auth result code here */
-
-    public static final String CREDENTIALS_FILE = "tcredentials";
-    public static final String CONSUMER_KEY = "conumer_key_here";
-	public static final String CONSUMER_SECRET = "consumer_secret_here" ;
-
 	public static final String REQUEST_URL = "http://api.twitter.com/oauth/request_token";
 	public static final String ACCESS_URL = "http://api.twitter.com/oauth/access_token";
 	public static final String AUTHORIZE_URL = "http://api.twitter.com/oauth/authorize";
 	public static final String OAUTH_CALLBACK_URL = "http://rambler.projects.simbits.nl/oauth";
 
     public static void authorizeCallback(int requestCode, int resultCode, Intent data, SharedPreferences prefs) {
-        if (requestCode == AUTHORIZE_ACTIVITY_RESULT_CODE) {
+        if (requestCode == Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE) {
             switch (resultCode) {
                 case Activity.RESULT_OK:
                     CredentialStore credentialStore = new SharedPreferencesCredentialStore(prefs);
@@ -70,11 +65,11 @@ public class TwitterUtilities
         }
 
 		Twitter twitter = new TwitterFactory().getInstance();
-		twitter.setOAuthConsumer(TwitterUtilities.CONSUMER_KEY, TwitterUtilities.CONSUMER_SECRET);
+		twitter.setOAuthConsumer(Secrets.TWITTER_CONSUMER_KEY, Secrets.TWITTER_CONSUMER_SECRET);
 		twitter.setOAuthAccessToken(a);
 		
 		try {
-			twitter.verifyCredentials();
+            twitter.verifyCredentials();
 			return true;
 		} catch (TwitterException e) {
 			return false;
@@ -94,7 +89,7 @@ public class TwitterUtilities
         }
 
 		Twitter twitter = new TwitterFactory().getInstance();
-		twitter.setOAuthConsumer(TwitterUtilities.CONSUMER_KEY, TwitterUtilities.CONSUMER_SECRET);
+		twitter.setOAuthConsumer(Secrets.TWITTER_CONSUMER_KEY, Secrets.TWITTER_CONSUMER_SECRET);
 		twitter.setOAuthAccessToken(a);
         return twitter.getScreenName();
     }
@@ -112,7 +107,7 @@ public class TwitterUtilities
         }
 
 		Twitter twitter = new TwitterFactory().getInstance();
-		twitter.setOAuthConsumer(TwitterUtilities.CONSUMER_KEY, TwitterUtilities.CONSUMER_SECRET);
+		twitter.setOAuthConsumer(Secrets.TWITTER_CONSUMER_KEY, Secrets.TWITTER_CONSUMER_SECRET);
 		twitter.setOAuthAccessToken(a);
         twitter.updateStatus(msg);
 	}	  
@@ -157,7 +152,7 @@ public class TwitterUtilities
         }
 
         Log.d(TAG, "sending tweet: " + su.toString());
-		twitter.setOAuthConsumer(TwitterUtilities.CONSUMER_KEY, TwitterUtilities.CONSUMER_SECRET);
+		twitter.setOAuthConsumer(Secrets.TWITTER_CONSUMER_KEY, Secrets.TWITTER_CONSUMER_SECRET);
 		twitter.setOAuthAccessToken(a);
         twitter.updateStatus(su);
     }

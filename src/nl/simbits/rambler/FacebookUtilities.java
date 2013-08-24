@@ -22,13 +22,11 @@ public class FacebookUtilities extends AsyncFacebookRunner
 {
 
     public static final String TAG = "FacebookUtilities";
-	public static final int AUTHORIZE_ACTIVITY_RESULT_CODE = 12345; /* Auth result code here */
 
     private static final String SP_TOKEN = "access_token";
     private static final String SP_EXPIRES = "expires_in";
     private static final String SP_KEY = "facebook-session";
 
-    public static final String APP_ID = "app_id_here";
     public static final String[] permissions = {"offline_access", "publish_stream", "read_stream",
                                                 "user_photos", "user_likes", "user_events", "photo_upload"};
 
@@ -49,7 +47,7 @@ public class FacebookUtilities extends AsyncFacebookRunner
     public static synchronized FacebookUtilities getInstance()
     {
         if (instance == null) {
-            fb = new Facebook(APP_ID);
+            fb = new Facebook(Secrets.FACEBOOK_APP_ID);
             instance = new FacebookUtilities(fb);
         }
         return instance;

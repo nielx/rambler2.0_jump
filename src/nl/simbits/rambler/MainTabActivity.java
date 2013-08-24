@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -91,7 +92,15 @@ public class MainTabActivity extends Activity
         
         IntentFilter filter = new IntentFilter(BluetoothSPPConnector.BROADCAST_INTENT_BLUETOOTH);
         registerReceiver(mBroadcastReceiver, filter);
-        
+
+        /**
+         * Unfortunately we do some networking on the main thread which Android 3+ does not allow
+         * TODO: remove main thread networking
+         */
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         /**
          * Facebook session
          */
@@ -105,7 +114,7 @@ public class MainTabActivity extends Activity
         mFbMessages = (TextView)findViewById(R.id.facebookMessages);
         mFbLoginButton = (LoginButton)findViewById(R.id.facebookLoginButton);
         mFbLoginButton.init(this, 
-                            FacebookUtilities.AUTHORIZE_ACTIVITY_RESULT_CODE, 
+                            Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE,
                             mFbSession, 
                             FacebookUtilities.permissions);
         
@@ -121,7 +130,7 @@ public class MainTabActivity extends Activity
         TwitterSessionEvents.addLogoutListener(mTwSessionListener);
         mTwMessages = (TextView)findViewById(R.id.twitterMessages);
         mTwLoginButton = (TwitterLoginButton)findViewById(R.id.twitterLoginButton);
-        mTwLoginButton.init(this, TwitterUtilities.AUTHORIZE_ACTIVITY_RESULT_CODE);
+        mTwLoginButton.init(this, Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE);
         
         requestTwitterScreenName();
 
@@ -325,11 +334,11 @@ public class MainTabActivity extends Activity
         super.onActivityResult(requestCode, resultCode, data);
 
         switch(requestCode) {
-            case FacebookUtilities.AUTHORIZE_ACTIVITY_RESULT_CODE: {
+            case Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE: {
                 mFbSession.authorizeCallback(requestCode, resultCode, data);
                 break;
             }
-            case TwitterUtilities.AUTHORIZE_ACTIVITY_RESULT_CODE: {
+            case Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE: {
                 TwitterUtilities.authorizeCallback(requestCode, resultCode, data, mPrefs);
                 break;
             }
