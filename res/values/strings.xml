@@ -15,4 +15,7 @@
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
 
+    <!-- TwitterOAuthActivity.java -->
+    <string name="twitter_oauth_progress_busy">Connecting to Twitter</string>
+
 </resources>
