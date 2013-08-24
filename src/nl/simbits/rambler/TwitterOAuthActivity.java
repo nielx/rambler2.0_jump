@@ -50,61 +50,7 @@ public class TwitterOAuthActivity extends Activity {
         mSigner = new OAuthHmacSigner();
 
         /* WebViewClient must be set BEFORE calling loadUrl! */
-        mWebView.setWebViewClient(new WebViewClient() {
-
-            @Override
-            public void onPageStarted(WebView view, String url,Bitmap bitmap)  {
-                System.out.println("onPageStarted : " + url);
-            }
-            @Override
-            public void onPageFinished(WebView view, String url)  {
-                // Hide the progress view
-                // TODO: animate in Android 4
-                mProgressView.setVisibility(View.GONE);
-                mWebView.setVisibility(View.VISIBLE);
-
-                if (url.startsWith(TwitterUtilities.OAUTH_CALLBACK_URL)) {
-                    if (url.indexOf("oauth_token=")!=-1) {
-
-                        String requestToken  = extractParamFromUrl(url,"oauth_token");
-                        String verifier= extractParamFromUrl(url,"oauth_verifier");
-
-                        mSigner.clientSharedSecret = Secrets.TWITTER_CONSUMER_SECRET;
-
-                        OAuthGetAccessToken accessToken = new OAuthGetAccessToken(TwitterUtilities.ACCESS_URL);
-                        accessToken.transport = new ApacheHttpTransport();
-                        accessToken.temporaryToken = requestToken;
-                        accessToken.signer = mSigner;
-                        accessToken.consumerKey = Secrets.TWITTER_CONSUMER_KEY;
-                        accessToken.verifier = verifier;
-
-
-                        mProgressView.setVisibility(View.VISIBLE);
-                        mWebView.setVisibility(View.GONE);
-
-                        new AccessTokenTask().execute(accessToken);
-
-                    } else if (url.indexOf("error=")!=-1) {
-                        view.setVisibility(View.INVISIBLE);
-                        new SharedPreferencesCredentialStore(prefs).clearCredentials();
-                        setResult(RESULT_CANCELED);
-                        finish();
-                    } else if (url.indexOf("denied=")!=-1) {
-                        view.setVisibility(View.INVISIBLE);
-                        new SharedPreferencesCredentialStore(prefs).clearCredentials();
-                        setResult(RESULT_CANCELED);
-                        finish();
-                    }
-                }
-                Log.d(TAG, "onPageFinished : " + url);
-
-            }
-            private String extractParamFromUrl(String url,String paramName) {
-                String queryString = url.substring(url.indexOf("?", 0)+1,url.length());
-                QueryStringParser queryStringParser = new QueryStringParser(queryString);
-                return queryStringParser.getQueryParamValue(paramName);
-            }
-        });
+        mWebView.setWebViewClient(new TwitterWebViewClient());
 
         // Start execution
         new GetTokenURLTask().execute(mSigner);
@@ -180,5 +126,61 @@ public class TwitterOAuthActivity extends Activity {
                 finish();
             }
         }
+    }
+
+    private class TwitterWebViewClient extends WebViewClient {
+        @Override
+        public void onPageStarted(WebView view, String url,Bitmap bitmap)  {
+            System.out.println("onPageStarted : " + url);
+        }
+        @Override
+        public void onPageFinished(WebView view, String url)  {
+            // Hide the progress view
+            // TODO: animate in Android 4
+            mProgressView.setVisibility(View.GONE);
+            mWebView.setVisibility(View.VISIBLE);
+
+            if (url.startsWith(TwitterUtilities.OAUTH_CALLBACK_URL)) {
+                if (url.indexOf("oauth_token=")!=-1) {
+
+                    String requestToken  = extractParamFromUrl(url,"oauth_token");
+                    String verifier= extractParamFromUrl(url,"oauth_verifier");
+
+                    mSigner.clientSharedSecret = Secrets.TWITTER_CONSUMER_SECRET;
+
+                    OAuthGetAccessToken accessToken = new OAuthGetAccessToken(TwitterUtilities.ACCESS_URL);
+                    accessToken.transport = new ApacheHttpTransport();
+                    accessToken.temporaryToken = requestToken;
+                    accessToken.signer = mSigner;
+                    accessToken.consumerKey = Secrets.TWITTER_CONSUMER_KEY;
+                    accessToken.verifier = verifier;
+
+
+                    mProgressView.setVisibility(View.VISIBLE);
+                    mWebView.setVisibility(View.GONE);
+
+                    new AccessTokenTask().execute(accessToken);
+
+                } else if (url.indexOf("error=")!=-1) {
+                    view.setVisibility(View.INVISIBLE);
+                    new SharedPreferencesCredentialStore(prefs).clearCredentials();
+                    setResult(RESULT_CANCELED);
+                    finish();
+                } else if (url.indexOf("denied=")!=-1) {
+                    view.setVisibility(View.INVISIBLE);
+                    new SharedPreferencesCredentialStore(prefs).clearCredentials();
+                    setResult(RESULT_CANCELED);
+                    finish();
+                }
+            }
+            Log.d(TAG, "onPageFinished : " + url);
+
+        }
+        private String extractParamFromUrl(String url,String paramName) {
+            String queryString = url.substring(url.indexOf("?", 0)+1,url.length());
+            QueryStringParser queryStringParser = new QueryStringParser(queryString);
+            return queryStringParser.getQueryParamValue(paramName);
+        }
+
     }
 }
