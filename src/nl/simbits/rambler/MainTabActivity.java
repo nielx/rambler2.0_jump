@@ -111,14 +111,19 @@ public class MainTabActivity extends Activity
                 mFacebookStatusReceiver, new IntentFilter(SocialService.FACEBOOK_STATUS));
 
         Intent facebookStatusIntent = new Intent(this, SocialService.class);
-        facebookStatusIntent.setAction(SocialService.QUERY_FACEBOOK_STATUS);
+        facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
         startService(facebookStatusIntent);
 
         mFbLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mFbAuthenticated) {
-                    // TODO: logout
+                    Intent cancelFacebookIntent = new Intent(MainTabActivity.this, SocialService.class);
+                    cancelFacebookIntent.setAction(SocialService.FACEBOOK_LOGOUT);
+                    startService(cancelFacebookIntent);
+                    mFbProgress.setVisibility(View.VISIBLE);
+                    mFbLoginButton.setVisibility(View.GONE);
+                    mFbMessages.setText("Logging out...");
                 } else {
                     // Sessions are started in a GUI setting, so we cannot delegate this to the
                     // SocialService
@@ -138,7 +143,7 @@ public class MainTabActivity extends Activity
                                         public void call(Session session, SessionState state, Exception exception) {
                                             // Call the service to further handle the session changes
                                             Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
-                                            facebookStatusIntent.setAction(SocialService.QUERY_FACEBOOK_STATUS);
+                                            facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
                                             startService(facebookStatusIntent);
                                         }
                                     }));

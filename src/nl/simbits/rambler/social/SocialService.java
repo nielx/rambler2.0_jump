@@ -17,7 +17,8 @@ public class SocialService extends IntentService {
     private final String TAG = "SocialService";
 
     // Intent actions
-    public final static String QUERY_FACEBOOK_STATUS = "rambler.intent.QUERY_FACEBOOK_STATUS";
+    public final static String FACEBOOK_QUERY_STATUS = "rambler.intent.FACEBOOK_QUERY_STATUS";
+    public final static String FACEBOOK_LOGOUT = "rambler.intent.FACEBOOK_LOGOUT";
 
     // Intent messages
     public final static String FACEBOOK_STATUS = "rambler.message.FACEBOOK_STATUS";
@@ -43,7 +44,7 @@ public class SocialService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         InitializeFacebook();
 
-        if (intent.getAction().equals(QUERY_FACEBOOK_STATUS)) {
+        if (intent.getAction().equals(FACEBOOK_QUERY_STATUS)) {
             // Process the Facebook Status
             Intent facebook_status = new Intent(FACEBOOK_STATUS);
             facebook_status.putExtra("authenticated", mFacebookConnection);
@@ -58,6 +59,15 @@ public class SocialService extends IntentService {
                 facebook_status.putExtra("name", mFacebookName);
             }
             LocalBroadcastManager.getInstance(this).sendBroadcast(facebook_status);
+        } else if (intent.getAction().equals(FACEBOOK_LOGOUT)) {
+            if (mFacebookConnection) {
+                Session.getActiveSession().closeAndClearTokenInformation();
+                Session.setActiveSession(null);
+                mFacebookConnection = false;
+                Intent facebook_status = new Intent(FACEBOOK_STATUS);
+                facebook_status.putExtra("authenticated", mFacebookConnection);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(facebook_status);
+            }
         }
     }
 
