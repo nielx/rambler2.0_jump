@@ -50,5 +50,6 @@
 		</activity>
 
         <service android:name=".RamblerService" />
+        <service android:name=".social.SocialService" />
     </application>
 </manifest> 
