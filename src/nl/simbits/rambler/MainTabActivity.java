@@ -31,14 +31,7 @@ import android.widget.Toast;
 import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
-import com.facebook.android.BaseRequestListener;
-import com.facebook.android.Facebook;
-import com.facebook.android.LoginButton;
-import com.facebook.android.SessionEvents;
-import com.facebook.android.SessionEvents.AuthListener;
-import com.facebook.android.SessionEvents.LogoutListener;
 
-import nl.simbits.rambler.RamblerApplication;
 import nl.simbits.rambler.social.SocialService;
 
 public class MainTabActivity extends Activity
