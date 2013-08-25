@@ -1,0 +1,2 @@
+include ':3dparty:facebook-android-sdk:facebook'
+include ':'
