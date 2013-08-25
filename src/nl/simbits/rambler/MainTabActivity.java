@@ -1,7 +1,5 @@
 package nl.simbits.rambler;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -114,42 +112,7 @@ public class MainTabActivity extends Activity
         facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
         startService(facebookStatusIntent);
 
-        mFbLoginButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mFbAuthenticated) {
-                    Intent cancelFacebookIntent = new Intent(MainTabActivity.this, SocialService.class);
-                    cancelFacebookIntent.setAction(SocialService.FACEBOOK_LOGOUT);
-                    startService(cancelFacebookIntent);
-                    mFbProgress.setVisibility(View.VISIBLE);
-                    mFbLoginButton.setVisibility(View.GONE);
-                    mFbMessages.setText("Logging out...");
-                } else {
-                    // Sessions are started in a GUI setting, so we cannot delegate this to the
-                    // SocialService
-                    Session session = Session.getActiveSession();
-                    if (session == null) {
-                        // This should never happen!
-                        Log.e(TAG, "No active facebook session. This should never happen!");
-                        return;
-                    }
-
-                    session.openForRead(
-                            new Session.OpenRequest(MainTabActivity.this)
-                                    .setPermissions(SocialService.FACEBOOK_READ_PERMISSIONS)
-                                    .setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO)
-                                    .setCallback(new Session.StatusCallback() {
-                                        @Override
-                                        public void call(Session session, SessionState state, Exception exception) {
-                                            // Call the service to further handle the session changes
-                                            Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
-                                            facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
-                                            startService(facebookStatusIntent);
-                                        }
-                                    }));
-                }
-            }
-        });
+        mFbLoginButton.setOnClickListener(mFacebookLoginButtonClick);
 
         /**
          * Twitter session
@@ -394,6 +357,43 @@ public class MainTabActivity extends Activity
             mFbProgress.setVisibility(View.GONE);
             mFbLoginButton.setVisibility(View.VISIBLE);
 
+        }
+    };
+
+    private OnClickListener mFacebookLoginButtonClick = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (mFbAuthenticated) {
+                Intent cancelFacebookIntent = new Intent(MainTabActivity.this, SocialService.class);
+                cancelFacebookIntent.setAction(SocialService.FACEBOOK_LOGOUT);
+                startService(cancelFacebookIntent);
+                mFbProgress.setVisibility(View.VISIBLE);
+                mFbLoginButton.setVisibility(View.GONE);
+                mFbMessages.setText("Logging out...");
+            } else {
+                // Sessions are started in a GUI setting, so we cannot delegate this to the
+                // SocialService
+                Session session = Session.getActiveSession();
+                if (session == null) {
+                    // This should never happen!
+                    Log.e(TAG, "No active facebook session. This should never happen!");
+                    return;
+                }
+
+                session.openForRead(
+                        new Session.OpenRequest(MainTabActivity.this)
+                                .setPermissions(SocialService.FACEBOOK_READ_PERMISSIONS)
+                                .setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO)
+                                .setCallback(new Session.StatusCallback() {
+                                    @Override
+                                    public void call(Session session, SessionState state, Exception exception) {
+                                        // Call the service to further handle the session changes
+                                        Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
+                                        facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
+                                        startService(facebookStatusIntent);
+                                    }
+                                }));
+            }
         }
     };
 }
