@@ -46,11 +46,11 @@ public class MainTabActivity extends Activity
     private SharedPreferences mPrefs;
     private BroadcastReceiver mBroadcastReceiver;
     
-    private FacebookUtilities mFacebook;
-    private Facebook mFbSession;
-    private TextView mFbMessages;
-    private LoginButton mFbLoginButton;
-    private FacebookSessionListener mFbSessionListener = new FacebookSessionListener();
+//    private FacebookUtilities mFacebook;
+//    private Facebook mFbSession;
+//    private TextView mFbMessages;
+//    private LoginButton mFbLoginButton;
+//    private FacebookSessionListener mFbSessionListener = new FacebookSessionListener();
 
     private TwitterSessionListener mTwSessionListener = new TwitterSessionListener();
     private TextView mTwMessages;
@@ -104,23 +104,23 @@ public class MainTabActivity extends Activity
         /**
          * Facebook session
          */
-        mFacebook = FacebookUtilities.getInstance();
-        mFacebook.restoreSession(mRambler);
-        mFbSession = mFacebook.getSession();
-
-        SessionEvents.addAuthListener(mFbSessionListener);
-        SessionEvents.addLogoutListener(mFbSessionListener);        
-
-        mFbMessages = (TextView)findViewById(R.id.facebookMessages);
-        mFbLoginButton = (LoginButton)findViewById(R.id.facebookLoginButton);
-        mFbLoginButton.init(this, 
-                            Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE,
-                            mFbSession, 
-                            FacebookUtilities.permissions);
-        
-        if (mFbSession.isSessionValid()) {
-            requestFacebookUserData();
-        }
+//        mFacebook = FacebookUtilities.getInstance();
+//        mFacebook.restoreSession(mRambler);
+//        mFbSession = mFacebook.getSession();
+//
+//        SessionEvents.addAuthListener(mFbSessionListener);
+//        SessionEvents.addLogoutListener(mFbSessionListener);
+//
+//        mFbMessages = (TextView)findViewById(R.id.facebookMessages);
+//        mFbLoginButton = (LoginButton)findViewById(R.id.facebookLoginButton);
+//        mFbLoginButton.init(this,
+//                            Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE,
+//                            mFbSession,
+//                            FacebookUtilities.permissions);
+//
+//        if (mFbSession.isSessionValid()) {
+//            requestFacebookUserData();
+//        }
         
         
         /**
@@ -202,50 +202,50 @@ public class MainTabActivity extends Activity
         	}
         }
     }
-    
-    public class UserRequestListener extends BaseRequestListener {
-        public void onComplete(final String response, final Object state) {
-			try {
-				final String name = new JSONObject(response).getString("name");
-	        	mHandler.post(new Runnable() {
-	                public void run() {
-	                	mFbMessages.setText("Logged in as " + name);
-                        Toast.makeText(getApplicationContext(), "Facebook logged in as " + name, Toast.LENGTH_SHORT).show();
-	                }
-	            });
-	        	
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-        }
-    }
+
+//    public class UserRequestListener extends BaseRequestListener {
+//        public void onComplete(final String response, final Object state) {
+//			try {
+//				final String name = new JSONObject(response).getString("name");
+//	        	mHandler.post(new Runnable() {
+//	                public void run() {
+//	                	mFbMessages.setText("Logged in as " + name);
+//                        Toast.makeText(getApplicationContext(), "Facebook logged in as " + name, Toast.LENGTH_SHORT).show();
+//	                }
+//	            });
+//
+//			} catch (JSONException e) {
+//				e.printStackTrace();
+//			}
+//        }
+//    }
    
-    public void requestFacebookUserData() {
-    	Bundle params = new Bundle();
-   		params.putString("fields", "name");
-		mFacebook.request("me", params, new UserRequestListener());
-    }
+//    public void requestFacebookUserData() {
+//    	Bundle params = new Bundle();
+//   		params.putString("fields", "name");
+//		mFacebook.request("me", params, new UserRequestListener());
+//    }
 
-    public class FacebookSessionListener implements AuthListener, LogoutListener {
-        public void onAuthSucceed() {
-            mFacebook.saveSession(mRambler);
-        	requestFacebookUserData();
-        }
-
-        public void onAuthFail(String error) {
-            mFbMessages.setText("Login Failed: " + error);
-            Toast.makeText(getApplicationContext(), "Facebook Login failed: " + error, Toast.LENGTH_SHORT).show();
-        }
-        
-        public void onLogoutBegin() {
-			Toast.makeText(getApplicationContext(), "Facebook logging out", Toast.LENGTH_SHORT).show();
-        }
-
-        public void onLogoutFinish() {
-            mFbMessages.setText("Logged out");
-            Toast.makeText(getApplicationContext(), "Facebook Logged out", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    public class FacebookSessionListener implements AuthListener, LogoutListener {
+//        public void onAuthSucceed() {
+//            mFacebook.saveSession(mRambler);
+//        	requestFacebookUserData();
+//        }
+//
+//        public void onAuthFail(String error) {
+//            mFbMessages.setText("Login Failed: " + error);
+//            Toast.makeText(getApplicationContext(), "Facebook Login failed: " + error, Toast.LENGTH_SHORT).show();
+//        }
+//
+//        public void onLogoutBegin() {
+//			Toast.makeText(getApplicationContext(), "Facebook logging out", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        public void onLogoutFinish() {
+//            mFbMessages.setText("Logged out");
+//            Toast.makeText(getApplicationContext(), "Facebook Logged out", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     public void requestTwitterScreenName() {
         mHandler.post(new Runnable() {
@@ -334,10 +334,10 @@ public class MainTabActivity extends Activity
         super.onActivityResult(requestCode, resultCode, data);
 
         switch(requestCode) {
-            case Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE: {
-                mFbSession.authorizeCallback(requestCode, resultCode, data);
-                break;
-            }
+//            case Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE: {
+//                mFbSession.authorizeCallback(requestCode, resultCode, data);
+//                break;
+//            }
             case Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE: {
                 TwitterUtilities.authorizeCallback(requestCode, resultCode, data, mPrefs);
                 break;
@@ -364,9 +364,9 @@ public class MainTabActivity extends Activity
     	
         Log.d(TAG, "onResume");
     	
-    	if(mFbSession != null && !mFbSession.isSessionValid()) {
-	    	mFbMessages.setText("You are logged out");
-    	}
+//    	if(mFbSession != null && !mFbSession.isSessionValid()) {
+//	    	mFbMessages.setText("You are logged out");
+//    	}
     	if (!TwitterUtilities.isAuthenticated(mPrefs)) {
 	    	mTwMessages.setText("You are logged out");
     	}
