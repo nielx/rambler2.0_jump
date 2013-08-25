@@ -28,3 +28,4 @@ local.properties
 
 # Secrets
 Secrets.java
+strings_secret.xml

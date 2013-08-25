@@ -18,13 +18,19 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.Session;
+import com.facebook.SessionLoginBehavior;
+import com.facebook.SessionState;
 import com.facebook.android.BaseRequestListener;
 import com.facebook.android.Facebook;
 import com.facebook.android.LoginButton;
@@ -33,6 +39,7 @@ import com.facebook.android.SessionEvents.AuthListener;
 import com.facebook.android.SessionEvents.LogoutListener;
 
 import nl.simbits.rambler.RamblerApplication;
+import nl.simbits.rambler.social.SocialService;
 
 public class MainTabActivity extends Activity
 {
@@ -45,12 +52,11 @@ public class MainTabActivity extends Activity
     private Handler mHandler;
     private SharedPreferences mPrefs;
     private BroadcastReceiver mBroadcastReceiver;
-    
-//    private FacebookUtilities mFacebook;
-//    private Facebook mFbSession;
-//    private TextView mFbMessages;
-//    private LoginButton mFbLoginButton;
-//    private FacebookSessionListener mFbSessionListener = new FacebookSessionListener();
+
+    private Boolean mFbAuthenticated = false;
+    private TextView mFbMessages;
+    private ProgressBar mFbProgress;
+    private Button mFbLoginButton;
 
     private TwitterSessionListener mTwSessionListener = new TwitterSessionListener();
     private TextView mTwMessages;
@@ -104,25 +110,49 @@ public class MainTabActivity extends Activity
         /**
          * Facebook session
          */
-//        mFacebook = FacebookUtilities.getInstance();
-//        mFacebook.restoreSession(mRambler);
-//        mFbSession = mFacebook.getSession();
-//
-//        SessionEvents.addAuthListener(mFbSessionListener);
-//        SessionEvents.addLogoutListener(mFbSessionListener);
-//
-//        mFbMessages = (TextView)findViewById(R.id.facebookMessages);
-//        mFbLoginButton = (LoginButton)findViewById(R.id.facebookLoginButton);
-//        mFbLoginButton.init(this,
-//                            Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE,
-//                            mFbSession,
-//                            FacebookUtilities.permissions);
-//
-//        if (mFbSession.isSessionValid()) {
-//            requestFacebookUserData();
-//        }
-        
-        
+        mFbMessages = (TextView)findViewById(R.id.facebook_message);
+        mFbProgress = (ProgressBar)findViewById(R.id.facebook_progress);
+        mFbLoginButton = (Button)findViewById(R.id.button_facebook_connect);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mFacebookStatusReceiver, new IntentFilter(SocialService.FACEBOOK_STATUS));
+
+        Intent facebookStatusIntent = new Intent(this, SocialService.class);
+        facebookStatusIntent.setAction(SocialService.QUERY_FACEBOOK_STATUS);
+        startService(facebookStatusIntent);
+
+        mFbLoginButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mFbAuthenticated) {
+                    // TODO: logout
+                } else {
+                    // Sessions are started in a GUI setting, so we cannot delegate this to the
+                    // SocialService
+                    Session session = Session.getActiveSession();
+                    if (session == null) {
+                        // This should never happen!
+                        Log.e(TAG, "No active facebook session. This should never happen!");
+                        return;
+                    }
+
+                    session.openForRead(
+                            new Session.OpenRequest(MainTabActivity.this)
+                                    .setPermissions(SocialService.FACEBOOK_READ_PERMISSIONS)
+                                    .setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO)
+                                    .setCallback(new Session.StatusCallback() {
+                                        @Override
+                                        public void call(Session session, SessionState state, Exception exception) {
+                                            // Call the service to further handle the session changes
+                                            Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
+                                            facebookStatusIntent.setAction(SocialService.QUERY_FACEBOOK_STATUS);
+                                            startService(facebookStatusIntent);
+                                        }
+                                    }));
+                }
+            }
+        });
+
         /**
          * Twitter session
          */
@@ -202,50 +232,6 @@ public class MainTabActivity extends Activity
         	}
         }
     }
-
-//    public class UserRequestListener extends BaseRequestListener {
-//        public void onComplete(final String response, final Object state) {
-//			try {
-//				final String name = new JSONObject(response).getString("name");
-//	        	mHandler.post(new Runnable() {
-//	                public void run() {
-//	                	mFbMessages.setText("Logged in as " + name);
-//                        Toast.makeText(getApplicationContext(), "Facebook logged in as " + name, Toast.LENGTH_SHORT).show();
-//	                }
-//	            });
-//
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-//        }
-//    }
-   
-//    public void requestFacebookUserData() {
-//    	Bundle params = new Bundle();
-//   		params.putString("fields", "name");
-//		mFacebook.request("me", params, new UserRequestListener());
-//    }
-
-//    public class FacebookSessionListener implements AuthListener, LogoutListener {
-//        public void onAuthSucceed() {
-//            mFacebook.saveSession(mRambler);
-//        	requestFacebookUserData();
-//        }
-//
-//        public void onAuthFail(String error) {
-//            mFbMessages.setText("Login Failed: " + error);
-//            Toast.makeText(getApplicationContext(), "Facebook Login failed: " + error, Toast.LENGTH_SHORT).show();
-//        }
-//
-//        public void onLogoutBegin() {
-//			Toast.makeText(getApplicationContext(), "Facebook logging out", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        public void onLogoutFinish() {
-//            mFbMessages.setText("Logged out");
-//            Toast.makeText(getApplicationContext(), "Facebook Logged out", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 
     public void requestTwitterScreenName() {
         mHandler.post(new Runnable() {
@@ -333,11 +319,12 @@ public class MainTabActivity extends Activity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Pass through to Facebook
+        Session fb_session = Session.getActiveSession();
+        if (fb_session != null)
+            fb_session.onActivityResult(this, requestCode, resultCode, data);
+
         switch(requestCode) {
-//            case Secrets.FACEBOOK_AUTHORIZE_ACTIVITY_RESULT_CODE: {
-//                mFbSession.authorizeCallback(requestCode, resultCode, data);
-//                break;
-//            }
             case Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE: {
                 TwitterUtilities.authorizeCallback(requestCode, resultCode, data, mPrefs);
                 break;
@@ -351,7 +338,8 @@ public class MainTabActivity extends Activity
             }
         }
     }
-     
+
+
     @Override
     public void onPause() {
     	super.onPause();
@@ -363,10 +351,7 @@ public class MainTabActivity extends Activity
     	super.onResume();
     	
         Log.d(TAG, "onResume");
-    	
-//    	if(mFbSession != null && !mFbSession.isSessionValid()) {
-//	    	mFbMessages.setText("You are logged out");
-//    	}
+
     	if (!TwitterUtilities.isAuthenticated(mPrefs)) {
 	    	mTwMessages.setText("You are logged out");
     	}
@@ -386,5 +371,31 @@ public class MainTabActivity extends Activity
             getApplicationContext().unbindService(mServiceConnection);
             mServiceBound = false;
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mFacebookStatusReceiver);
     }
+
+    private BroadcastReceiver mFacebookStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received new Facebook status");
+
+            if (intent.getBooleanExtra("authenticated", false)) {
+                Log.d(TAG, "Facebook Status: authenticated");
+                mFbMessages.setText("Connected as " + intent.getStringExtra("name"));
+                mFbLoginButton.setText("Logout");
+                mFbAuthenticated = true;
+            } else {
+                Log.d(TAG, "Facebook Status: not authenticated");
+                mFbMessages.setText("Not connected");
+                mFbLoginButton.setText("Connect");
+                mFbAuthenticated = false;
+            }
+
+            // Whatever changed, this should be the standard now
+            mFbProgress.setVisibility(View.GONE);
+            mFbLoginButton.setVisibility(View.VISIBLE);
+
+        }
+    };
 }
