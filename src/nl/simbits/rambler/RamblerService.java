@@ -3,13 +3,11 @@ package nl.simbits.rambler;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -27,6 +25,9 @@ import java.util.ListIterator;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import nl.simbits.rambler.social.FacebookEvent;
+import nl.simbits.rambler.social.FacebookUtilities;
 
 public class RamblerService extends Service 
 {
@@ -252,7 +253,7 @@ public class RamblerService extends Service
                     Thread.sleep(EVENT_UPDATE_INTERVAL);
                     Log.d(TAG, "ramblerThread check facebook events");
 
-                    List<FacebookEvent> events = mFacebook.getEventsInVicinityOf(mLastBestLocation, 
+                    List<FacebookEvent> events = mFacebook.getEventsInVicinityOf(mLastBestLocation,
                     															EVENT_ARRIVAL_DISTANCE);
                     if (!events.isEmpty()) {
                         ListIterator<FacebookEvent> i = events.listIterator();

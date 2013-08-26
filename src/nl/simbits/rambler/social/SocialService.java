@@ -13,6 +13,9 @@ import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.model.GraphUser;
 
+/**
+ * This service takes some network-activities off the main thread. It is a helper to the Activities.
+ */
 public class SocialService extends IntentService {
     private final String TAG = "SocialService";
 
@@ -29,7 +32,6 @@ public class SocialService extends IntentService {
     public static final String[] FACEBOOK_PUBLISH_PERMISSIONS = {
             "publish_stream"
     };
-
 
 
     private Boolean mFacebookConnection = false;
@@ -86,7 +88,7 @@ public class SocialService extends IntentService {
 
         // Check the status of the Session
         if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-            Log.d(TAG, "Facebook Session has a cached token, we can load");
+            Log.d(TAG, "Facebook Session has a cached token, the activity should load");
         } else if (session.getState().equals(SessionState.CREATED)) {
             Log.d(TAG, "There is no previous Facebook Session loaded");
         } else if (session.getState().equals(SessionState.OPENED)) {

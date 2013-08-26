@@ -1,4 +1,4 @@
-package nl.simbits.rambler;
+package nl.simbits.rambler.social;
 
 import android.location.Location;
 import android.util.Log;
