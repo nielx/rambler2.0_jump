@@ -374,7 +374,7 @@ public class MainTabActivity extends Activity
                 // Sessions are started in a GUI setting, so we cannot delegate this to the
                 // SocialService
                 Session session = Session.getActiveSession();
-                if (session == null) {
+                if (session == null ) {
                     // This should never happen!
                     Log.e(TAG, "No active facebook session. This should never happen!");
                     return;
@@ -387,6 +387,13 @@ public class MainTabActivity extends Activity
                                 .setCallback(new Session.StatusCallback() {
                                     @Override
                                     public void call(Session session, SessionState state, Exception exception) {
+                                        if (state.equals(SessionState.CLOSED_LOGIN_FAILED)) {
+                                            // Failed or cancelled login, replace the session with
+                                            // a new one
+                                            Session.setActiveSession(new Session(MainTabActivity.this));
+                                            return;
+                                        }
+
                                         // Call the service to further handle the session changes
                                         Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
                                         facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
