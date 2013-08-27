@@ -50,9 +50,9 @@ public class SocialService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        // For speed reasons Facebook is initialized first, since checking the status does not
+        // require network connection
         InitializeFacebook();
-        InitializeTwitter();
-
         if (intent.getAction().equals(FACEBOOK_QUERY_STATUS)) {
             // Process the Facebook Status
             Intent facebook_status = new Intent(FACEBOOK_STATUS);
@@ -77,7 +77,11 @@ public class SocialService extends IntentService {
                 facebook_status.putExtra("authenticated", mFacebookConnection);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(facebook_status);
             }
-        } else if (intent.getAction().equals(TWITTER_QUERY_STATUS)) {
+        }
+
+        // Now initialize twitter, if logged in it might take a while the first time
+        InitializeTwitter();
+        if (intent.getAction().equals(TWITTER_QUERY_STATUS)) {
             Intent twitter_status = new Intent(TWITTER_STATUS);
             twitter_status.putExtra("authenticated", mTwitterConnection);
             if (mTwitterConnection)
