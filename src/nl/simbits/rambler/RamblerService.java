@@ -28,6 +28,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import nl.simbits.rambler.social.FacebookEvent;
 import nl.simbits.rambler.social.FacebookUtilities;
+import nl.simbits.rambler.social.TwitterUtilities;
 
 public class RamblerService extends Service 
 {
@@ -263,9 +264,9 @@ public class RamblerService extends Service
                             String msg = "Just arrived at " + event.getName() + ": http://www.facebook.com/events/" + event.getGraphId() + "/";
                             mFacebook.post(msg);
                             try {
-                                TwitterUtilities.sendTweetAsync(mPreferences, msg,
-                                                                mLastBestLocation.getLatitude(), 
-                                                                mLastBestLocation.getLongitude());
+                                TwitterUtilities.sendTweetAsync(msg,
+                                        mLastBestLocation.getLatitude(),
+                                        mLastBestLocation.getLongitude());
                             } catch (Exception e) {
                                 Log.w(TAG, "Failed sending tweet: " + e.getMessage());
                             }
@@ -382,7 +383,7 @@ public class RamblerService extends Service
                                                                  mStepsWalked).out().toString();
 
                            try {
-                               TwitterUtilities.sendTweetAsync(mPreferences, tweet, mLastBestLocation.getLatitude(), mLastBestLocation.getLongitude());
+                               TwitterUtilities.sendTweetAsync(tweet, mLastBestLocation.getLatitude(), mLastBestLocation.getLongitude());
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            }        
@@ -455,8 +456,8 @@ public class RamblerService extends Service
                                Log.e(TAG, "Failed posting to facebook: " + e.getMessage());
                            }
                            try {
-                               TwitterUtilities.sendTweetAsync(mPreferences, 
-                                                               "Just arrived at " + addr +": " + mapURL,
+                               TwitterUtilities.sendTweetAsync(
+                                       "Just arrived at " + addr +": " + mapURL,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
                            } catch (Exception e) {
@@ -466,8 +467,8 @@ public class RamblerService extends Service
                        case 1:
                         Log.i(TAG, "Received 1 jump");
                            try {
-                               TwitterUtilities.sendTweetAsync(mPreferences, 
-                                                               "I am here: " + mapURL,
+                               TwitterUtilities.sendTweetAsync(
+                                       "I am here: " + mapURL,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
 

@@ -9,13 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -40,8 +36,6 @@ public class MainTabActivity extends Activity
     private ProgressDialog mProgressDialog;
     
     private RamblerApplication mRambler;
-    private Handler mHandler;
-    private SharedPreferences mPrefs;
     private BroadcastReceiver mBroadcastReceiver;
 
     private Boolean mFbAuthenticated = false;
@@ -49,9 +43,10 @@ public class MainTabActivity extends Activity
     private ProgressBar mFbProgress;
     private Button mFbLoginButton;
 
-    private TwitterSessionListener mTwSessionListener = new TwitterSessionListener();
+    private Boolean mTwAuthenticated = false;
     private TextView mTwMessages;
-    private TwitterLoginButton mTwLoginButton;
+    private ProgressBar mTwProgress;
+    private Button mTwLoginButton;
 
     private BluetoothAdapter mBtAdapter;
     private TextView mBtMessages;
@@ -83,20 +78,10 @@ public class MainTabActivity extends Activity
         mProgressDialog.setIndeterminate(true);
         
         mRambler = (RamblerApplication) getApplication();
-        mHandler = new Handler();
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mBroadcastReceiver = new BluetoothConnectionReceiver();
         
         IntentFilter filter = new IntentFilter(BluetoothSPPConnector.BROADCAST_INTENT_BLUETOOTH);
         registerReceiver(mBroadcastReceiver, filter);
-
-        /**
-         * Unfortunately we do some networking on the main thread which Android 3+ does not allow
-         * TODO: remove main thread networking
-         */
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
 
         /**
          * Facebook session
@@ -117,15 +102,19 @@ public class MainTabActivity extends Activity
         /**
          * Twitter session
          */
-        TwitterSessionEvents.addAuthListener(mTwSessionListener);
-        TwitterSessionEvents.addLogoutListener(mTwSessionListener);
-        mTwMessages = (TextView)findViewById(R.id.twitterMessages);
-        mTwLoginButton = (TwitterLoginButton)findViewById(R.id.twitterLoginButton);
-        mTwLoginButton.init(this, Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE);
-        
-        requestTwitterScreenName();
+        mTwMessages = (TextView)findViewById(R.id.twitter_message);
+        mTwProgress = (ProgressBar)findViewById(R.id.twitter_progress);
+        mTwLoginButton = (Button)findViewById(R.id.button_twitter_connect);
 
-        
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mTwitterStatusReceiver, new IntentFilter(SocialService.TWITTER_STATUS));
+
+        Intent twitterStatusIntent = new Intent(this, SocialService.class);
+        twitterStatusIntent.setAction(SocialService.TWITTER_QUERY_STATUS);
+        startService(twitterStatusIntent);
+
+        mTwLoginButton.setOnClickListener(mTwitterLoginButtonClick);
+
         /**
          * Bluetooth
          */
@@ -194,48 +183,6 @@ public class MainTabActivity extends Activity
         }
     }
 
-    public void requestTwitterScreenName() {
-        mHandler.post(new Runnable() {
-            public void run() {
-                if (TwitterUtilities.isAuthenticated(mPrefs)) {
-                    try {
-                        String name = TwitterUtilities.getScreenName(mPrefs);
-                        mTwMessages.setText("Logged in as " + name);
-                        Toast.makeText(getApplicationContext(), 
-                                       "Twitter Logged in as " + name, Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        mTwMessages.setText("Failed to get screen name: " + e.toString());
-                        Log.d(TAG, "Failed to get screen name: " + e.toString());
-                    }
-                }
-            }
-        });
-    }
-    
-    public class TwitterSessionListener implements TwitterSessionEvents.TwitterAuthListener, 
-	    											   TwitterSessionEvents.TwitterLogoutListener {
-		@Override
-		public void onAuthSucceed() {
-			requestTwitterScreenName();
-		}
-	
-		@Override
-		public void onAuthFail(String error) { 
-            mTwMessages.setText("Login Failed: " + error);
-			Toast.makeText(getApplicationContext(), "Twitter login failed: " + error, Toast.LENGTH_SHORT).show();
-		}
-		
-		@Override
-		public void onLogoutBegin() {
-			Toast.makeText(getApplicationContext(), "Twitter logging out", Toast.LENGTH_SHORT).show();
-		}
-		@Override
-		public void onLogoutFinish() {
-            mTwMessages.setText("Logged out");
-			Toast.makeText(getApplicationContext(), "Twitter logged out", Toast.LENGTH_SHORT).show();
-		}
-	}
-    
     public class BluetoothConnectionReceiver extends BroadcastReceiver {
     	@Override
     	public void onReceive(Context context, Intent intent) {
@@ -287,7 +234,13 @@ public class MainTabActivity extends Activity
 
         switch(requestCode) {
             case Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE: {
-                TwitterUtilities.authorizeCallback(requestCode, resultCode, data, mPrefs);
+                mTwProgress.setVisibility(View.VISIBLE);
+                mTwLoginButton.setVisibility(View.GONE);
+                mTwMessages.setText("Logging in...");
+
+                Intent twitterStatusIntent = new Intent(this, SocialService.class);
+                twitterStatusIntent.setAction(SocialService.TWITTER_QUERY_STATUS);
+                startService(twitterStatusIntent);
                 break;
             }
             
@@ -313,10 +266,6 @@ public class MainTabActivity extends Activity
     	
         Log.d(TAG, "onResume");
 
-    	if (!TwitterUtilities.isAuthenticated(mPrefs)) {
-	    	mTwMessages.setText("You are logged out");
-    	}
-    	
     	if (mServiceBound) {
     		mService.broadcastBluetoothState();
     	}
@@ -334,6 +283,7 @@ public class MainTabActivity extends Activity
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mFacebookStatusReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mTwitterStatusReceiver);
     }
 
     private BroadcastReceiver mFacebookStatusReceiver = new BroadcastReceiver() {
@@ -403,4 +353,51 @@ public class MainTabActivity extends Activity
             }
         }
     };
+
+    private BroadcastReceiver mTwitterStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received new Twitter status");
+
+            if (intent.getBooleanExtra("authenticated", false)) {
+                Log.d(TAG, "Twitter Status: authenticated");
+                mTwMessages.setText("Connected as " + intent.getStringExtra("name"));
+                mTwLoginButton.setText("Logout");
+                mTwAuthenticated = true;
+            } else {
+                Log.d(TAG, "Twitter Status: not authenticated");
+                mTwMessages.setText("Not connected");
+                mTwLoginButton.setText("Connect");
+                mTwAuthenticated = false;
+            }
+
+            // Whatever changed, this should be the standard now
+            mTwProgress.setVisibility(View.GONE);
+            mTwLoginButton.setVisibility(View.VISIBLE);
+
+        }
+    };
+
+    private OnClickListener mTwitterLoginButtonClick = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (mTwAuthenticated) {
+                mTwProgress.setVisibility(View.VISIBLE);
+                mTwLoginButton.setVisibility(View.GONE);
+                mTwMessages.setText("Logging out...");
+
+                // Use the SocialService to Log Out
+                Intent cancelTwitterIntent = new Intent(MainTabActivity.this, SocialService.class);
+                cancelTwitterIntent.setAction(SocialService.TWITTER_LOGOUT);
+                startService(cancelTwitterIntent);
+
+            } else {
+                startActivityForResult(new Intent().setClass(MainTabActivity.this,
+                        TwitterOAuthActivity.class),
+                        Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE);
+            }
+        }
+    };
+
+
 }

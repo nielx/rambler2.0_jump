@@ -22,9 +22,12 @@ public class SocialService extends IntentService {
     // Intent actions
     public final static String FACEBOOK_QUERY_STATUS = "rambler.intent.FACEBOOK_QUERY_STATUS";
     public final static String FACEBOOK_LOGOUT = "rambler.intent.FACEBOOK_LOGOUT";
+    public final static String TWITTER_QUERY_STATUS = "rambler.intent.TWITTER_QUERY_STATUS";
+    public final static String TWITTER_LOGOUT = "rambler.intent.TWITTER_LOGOUT";
 
     // Intent messages
     public final static String FACEBOOK_STATUS = "rambler.message.FACEBOOK_STATUS";
+    public final static String TWITTER_STATUS = "rambler.message.TWITTER_STATUS";
 
     // Other constants
     public static final String[] FACEBOOK_READ_PERMISSIONS = {"offline_access",
@@ -37,6 +40,9 @@ public class SocialService extends IntentService {
     private Boolean mFacebookConnection = false;
     private String mFacebookName = "";
 
+    private Boolean mTwitterConnection = false;
+    private String mTwitterName = "";
+
     public SocialService() {
         super("RamblerSocialService");
     }
@@ -45,6 +51,7 @@ public class SocialService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         InitializeFacebook();
+        InitializeTwitter();
 
         if (intent.getAction().equals(FACEBOOK_QUERY_STATUS)) {
             // Process the Facebook Status
@@ -70,9 +77,22 @@ public class SocialService extends IntentService {
                 facebook_status.putExtra("authenticated", mFacebookConnection);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(facebook_status);
             }
+        } else if (intent.getAction().equals(TWITTER_QUERY_STATUS)) {
+            Intent twitter_status = new Intent(TWITTER_STATUS);
+            twitter_status.putExtra("authenticated", mTwitterConnection);
+            if (mTwitterConnection)
+                twitter_status.putExtra("name", mTwitterName);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(twitter_status);
+        } else if (intent.getAction().equals(TWITTER_LOGOUT)) {
+            if (mTwitterConnection) {
+                TwitterSession.getActiveSession().logOut();
+                mTwitterConnection = false;
+                Intent twitter_status = new Intent(TWITTER_STATUS);
+                twitter_status.putExtra("authenticated", mTwitterConnection);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(twitter_status);
+            }
         }
     }
-
 
     private void InitializeFacebook() {
         // Extra logging for Facebook
@@ -95,6 +115,22 @@ public class SocialService extends IntentService {
             mFacebookConnection = true;
         } else {
             Log.d(TAG, "There is another facebook status: " + session.getState().toString());
+        }
+    }
+
+    private void InitializeTwitter() {
+        TwitterSession session = TwitterSession.getActiveSession();
+        if (session == null) {
+            // Create a Twitter Session
+            session = new TwitterSession(this);
+            if (session.getState().equals(TwitterSession.State.OPENED)) {
+                session.setActiveSession(session);
+            }
+        }
+
+        if (session.getState().equals(TwitterSession.State.OPENED)) {
+            mTwitterConnection = true;
+            mTwitterName = session.getScreenName();
         }
     }
 }

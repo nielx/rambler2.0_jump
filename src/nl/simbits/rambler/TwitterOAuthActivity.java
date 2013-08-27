@@ -3,7 +3,6 @@ package nl.simbits.rambler;
 import java.io.IOException;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.ecs.sample.store.CredentialStore;
 import com.ecs.sample.store.SharedPreferencesCredentialStore;
 import com.ecs.sample.util.QueryStringParser;
 
@@ -23,6 +23,8 @@ import com.google.api.client.auth.oauth.OAuthGetAccessToken;
 import com.google.api.client.auth.oauth.OAuthGetTemporaryToken;
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.http.apache.ApacheHttpTransport;
+
+import nl.simbits.rambler.social.TwitterUtilities;
 
 public class TwitterOAuthActivity extends Activity {
 
@@ -102,6 +104,14 @@ public class TwitterOAuthActivity extends Activity {
             OAuthCredentialsResponse credentials;
             try {
                 credentials = accessToken.execute();
+
+                // Store the tokens in the secret credentials
+                CredentialStore credentialStore = new SharedPreferencesCredentialStore(
+                        PreferenceManager.getDefaultSharedPreferences(TwitterOAuthActivity.this));
+                credentialStore.write(new String[] {credentials.token, credentials.tokenSecret});
+                Log.d(TAG, "authorizeCallback: " + credentials.token + " | " +
+                        credentials.tokenSecret);
+
             } catch (IOException e) {
                 Log.e(TAG, "Error validating access token");
                 credentials = null;
@@ -115,14 +125,7 @@ public class TwitterOAuthActivity extends Activity {
                 setResult(RESULT_CANCELED);
                 finish();
             } else {
-                mSigner.tokenSharedSecret = credentials.tokenSecret;
-
-                Intent in = new Intent();
-                Bundle b = new Bundle();
-                b.putString("token", credentials.token);
-                b.putString("secret", credentials.tokenSecret);
-                in.putExtras(b);
-                setResult(RESULT_OK, in);
+                setResult(RESULT_OK);
                 finish();
             }
         }
