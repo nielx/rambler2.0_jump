@@ -129,17 +129,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <ImageButton
-            android:id="@+id/bluetoothConnectButton"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/bt_connect_button" />
+            android:src="@drawable/logo_bluetooth"
+            android:paddingRight="10dp"/>
 
         <TextView
-            android:id="@+id/bluetoothMessages"
+            android:id="@+id/bluetooth_message"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_marginTop="5dp" />
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/button_bluetooth_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connect"/>
 
     </LinearLayout>
 
@@ -148,7 +155,7 @@
         android:layout_width="fill_parent"
         android:layout_height="2dp"
         android:layout_marginBottom="10dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="10dp"
         android:background="@color/grey"
         android:scaleType="fitXY"
         android:src="@android:drawable/divider_horizontal_bright" />

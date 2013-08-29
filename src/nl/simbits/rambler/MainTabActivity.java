@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -17,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +48,7 @@ public class MainTabActivity extends Activity
 
     private BluetoothAdapter mBtAdapter;
     private TextView mBtMessages;
-    private ImageButton mBtConnectButton;
+    private Button mBtConnectButton;
     private boolean mShoeConnected;
 
     private boolean mServiceBound;
@@ -118,11 +116,10 @@ public class MainTabActivity extends Activity
         /**
          * Bluetooth
          */
-        mBtMessages = (TextView)findViewById(R.id.bluetoothMessages);
-        mBtConnectButton = (ImageButton)findViewById(R.id.bluetoothConnectButton);
+        mBtMessages = (TextView)findViewById(R.id.bluetooth_message);
+        mBtConnectButton = (Button)findViewById(R.id.button_bluetooth_connect);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         
-        mBtConnectButton.setBackgroundColor(Color.TRANSPARENT);
         mBtConnectButton.setOnClickListener(new ButtonOnClickListener());
         mBtConnectButton.setEnabled(false);
 
@@ -160,7 +157,7 @@ public class MainTabActivity extends Activity
     
     public void disconnectShoe() {
 		mService.stopBluetoothConnection();
-		mBtConnectButton.setImageResource(R.drawable.bt_connect_button);
+		mBtConnectButton.setText("Connect");
 		mShoeConnected = false;
 		mBtMessages.setText("Disconnected");
     }
@@ -200,7 +197,7 @@ public class MainTabActivity extends Activity
     			switch (state) {
     				case BluetoothSPPConnector.BT_CONNECTED: {
     					mBtMessages.setText("Connected to " + name + " (" + address + ")");
-    					mBtConnectButton.setImageResource(R.drawable.bt_disconnect_button);
+    					mBtConnectButton.setText("Disconnect");
     					mShoeConnected = true;
     					break;
     				}
@@ -213,7 +210,7 @@ public class MainTabActivity extends Activity
     				default: {
     					mBtMessages.setText("Unable to connect with " + name + " (" + address + "): " + 
     										((stateText.equals("")) ? "" : ": " + stateText));
-    					mBtConnectButton.setImageResource(R.drawable.bt_connect_button);
+    					mBtConnectButton.setText("Connect");
     					mShoeConnected = false;
     				}
     			}
