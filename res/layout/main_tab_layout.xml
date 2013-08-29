@@ -140,13 +140,21 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:text="Trying to connect to Rambler"/>
+
+        <ProgressBar
+            android:id="@+id/bluetooth_progress"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            />
 
         <Button
             android:id="@+id/button_bluetooth_connect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connect"/>
+            android:text="Connect"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

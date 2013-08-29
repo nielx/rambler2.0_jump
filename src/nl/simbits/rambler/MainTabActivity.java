@@ -1,7 +1,6 @@
 package nl.simbits.rambler;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -31,8 +30,6 @@ public class MainTabActivity extends Activity
     public static final String TAG = "MainTabActivity";
     public static final int BLUETOOTH_REQUEST_ENABLE = 1;
     
-    private ProgressDialog mProgressDialog;
-    
     private RamblerApplication mRambler;
     private BroadcastReceiver mBroadcastReceiver;
 
@@ -49,6 +46,7 @@ public class MainTabActivity extends Activity
     private BluetoothAdapter mBtAdapter;
     private TextView mBtMessages;
     private Button mBtConnectButton;
+    private ProgressBar mBtProgress;
     private boolean mShoeConnected;
 
     private boolean mServiceBound;
@@ -72,9 +70,6 @@ public class MainTabActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_tab_layout);
 
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setIndeterminate(true);
-        
         mRambler = (RamblerApplication) getApplication();
         mBroadcastReceiver = new BluetoothConnectionReceiver();
         
@@ -118,6 +113,7 @@ public class MainTabActivity extends Activity
          */
         mBtMessages = (TextView)findViewById(R.id.bluetooth_message);
         mBtConnectButton = (Button)findViewById(R.id.button_bluetooth_connect);
+        mBtProgress = (ProgressBar)findViewById(R.id.bluetooth_progress);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         
         mBtConnectButton.setOnClickListener(new ButtonOnClickListener());
@@ -126,6 +122,8 @@ public class MainTabActivity extends Activity
         if (mBtAdapter == null) {
         	mBtMessages.setText("Bluetooth not available");
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            mBtProgress.setVisibility(View.GONE);
+            mBtConnectButton.setVisibility(View.VISIBLE);
             mBtConnectButton.setEnabled(false);
         }
     }
@@ -149,10 +147,9 @@ public class MainTabActivity extends Activity
     
     public void connectToShoe() {
 		mBtMessages.setText("Trying to connect");
-		mProgressDialog.setTitle("Connecting");
-		mProgressDialog.setMessage("Trying to connect to rambler shoe");
-		mProgressDialog.show();
-		mService.startBluetoothConnection();	
+        mBtProgress.setVisibility(View.VISIBLE);
+        mBtConnectButton.setVisibility(View.GONE);
+		mService.startBluetoothConnection();
     }
     
     public void disconnectShoe() {
@@ -214,8 +211,9 @@ public class MainTabActivity extends Activity
     					mShoeConnected = false;
     				}
     			}
-    			
-    			mProgressDialog.dismiss(); 
+
+                mBtProgress.setVisibility(View.GONE);
+                mBtConnectButton.setVisibility(View.VISIBLE);
     		}
     	}
     }
