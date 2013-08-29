@@ -49,9 +49,9 @@
             android:id="@+id/facebook_message"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/black"
             android:text="Checking connection"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:layout_weight="1"/>
 
         <View
             android:layout_width="0dp"
@@ -99,7 +99,6 @@
             android:id="@+id/twitter_message"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/black"
             android:text="Checking connection"
             android:gravity="center_vertical"/>
 
@@ -146,7 +145,7 @@
 
         <TextView
             android:id="@+id/bluetoothMessages"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_marginTop="5dp" />
 
