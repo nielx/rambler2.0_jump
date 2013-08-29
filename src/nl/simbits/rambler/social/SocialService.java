@@ -37,6 +37,7 @@ public class SocialService extends IntentService {
     };
 
 
+    private Boolean mFacebookToken = false;
     private Boolean mFacebookConnection = false;
     private String mFacebookName = "";
 
@@ -57,6 +58,7 @@ public class SocialService extends IntentService {
             // Process the Facebook Status
             Intent facebook_status = new Intent(FACEBOOK_STATUS);
             facebook_status.putExtra("authenticated", mFacebookConnection);
+            facebook_status.putExtra("has_token", mFacebookToken);
             if (mFacebookConnection) {
                 // Get the user info
                 Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
@@ -112,10 +114,12 @@ public class SocialService extends IntentService {
 
         // Check the status of the Session
         if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-            Log.d(TAG, "Facebook Session has a cached token, the activity should load");
+            Log.d(TAG, "Facebook Session has a cached token, the activity should load it");
+            mFacebookToken = true;
         } else if (session.getState().equals(SessionState.CREATED)) {
             Log.d(TAG, "There is no previous Facebook Session loaded");
         } else if (session.getState().equals(SessionState.OPENED)) {
+            mFacebookToken = true;
             mFacebookConnection = true;
         } else {
             Log.d(TAG, "There is another facebook status: " + session.getState().toString());

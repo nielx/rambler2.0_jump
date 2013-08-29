@@ -287,8 +287,14 @@ public class MainTabActivity extends Activity
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Received new Facebook status");
-
-            if (intent.getBooleanExtra("authenticated", false)) {
+            if (intent.getBooleanExtra("has_token", false) &&
+                    !intent.getBooleanExtra("authenticated", false))
+            {
+                Log.d(TAG, "Facebook Status: not authenticated but token present");
+                // Start session
+                _FacebookOpenSession();
+                return; // We do not want the progress bar gone and the login button visible in this case
+            } else if (intent.getBooleanExtra("authenticated", false)) {
                 Log.d(TAG, "Facebook Status: authenticated");
                 mFbMessages.setText("Connected as " + intent.getStringExtra("name"));
                 mFbLoginButton.setText("Logout");
@@ -320,36 +326,40 @@ public class MainTabActivity extends Activity
             } else {
                 // Sessions are started in a GUI setting, so we cannot delegate this to the
                 // SocialService
-                Session session = Session.getActiveSession();
-                if (session == null ) {
+                if (Session.getActiveSession() == null ) {
                     // This should never happen!
                     Log.e(TAG, "No active facebook session. This should never happen!");
                     return;
                 }
-
-                session.openForRead(
-                        new Session.OpenRequest(MainTabActivity.this)
-                                .setPermissions(SocialService.FACEBOOK_READ_PERMISSIONS)
-                                .setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO)
-                                .setCallback(new Session.StatusCallback() {
-                                    @Override
-                                    public void call(Session session, SessionState state, Exception exception) {
-                                        if (state.equals(SessionState.CLOSED_LOGIN_FAILED)) {
-                                            // Failed or cancelled login, replace the session with
-                                            // a new one
-                                            Session.setActiveSession(new Session(MainTabActivity.this));
-                                            return;
-                                        }
-
-                                        // Call the service to further handle the session changes
-                                        Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
-                                        facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
-                                        startService(facebookStatusIntent);
-                                    }
-                                }));
+                _FacebookOpenSession();
             }
         }
     };
+
+    private void _FacebookOpenSession() {
+        Session session = Session.getActiveSession();
+        session.openForRead(
+                new Session.OpenRequest(MainTabActivity.this)
+                        .setPermissions(SocialService.FACEBOOK_READ_PERMISSIONS)
+                        .setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO)
+                        .setCallback(new Session.StatusCallback() {
+                            @Override
+                            public void call(Session session, SessionState state, Exception exception) {
+                                if (state.equals(SessionState.CLOSED_LOGIN_FAILED)) {
+                                    // Failed or cancelled login, replace the session with
+                                    // a new one
+                                    Session.setActiveSession(new Session(MainTabActivity.this));
+                                    return;
+                                }
+
+                                // Call the service to further handle the session changes
+                                Intent facebookStatusIntent = new Intent(MainTabActivity.this, SocialService.class);
+                                facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
+                                startService(facebookStatusIntent);
+                            }
+                        }));
+
+    }
 
     private BroadcastReceiver mTwitterStatusReceiver = new BroadcastReceiver() {
         @Override
