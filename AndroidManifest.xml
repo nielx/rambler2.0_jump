@@ -58,5 +58,6 @@
         <service android:name=".social.SocialService" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="073ed992cd0508c02b2e4e14873b598cf464955a"/>
     </application>
 </manifest> 
