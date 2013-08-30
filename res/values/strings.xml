@@ -18,4 +18,8 @@
     <!-- TwitterOAuthActivity.java -->
     <string name="twitter_oauth_progress_busy">Connecting to Twitter</string>
 
+    <!-- MainActivity -->
+    <string name="drawer_open">Show connection status</string>
+    <string name="drawer_close">Hide connection status</string>
+
 </resources>
