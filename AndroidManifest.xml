@@ -54,7 +54,8 @@
                   android:label="@string/app_name" />
         <activity
             android:name=".holo.MainActivity"
-            android:label="Jump">
+            android:label="Jump"
+            android:theme="@android:style/Theme.Holo.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
