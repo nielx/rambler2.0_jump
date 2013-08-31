@@ -41,7 +41,7 @@
                   android:configChanges="orientation|keyboardHidden" />
   
           <!--<activity android:name=".TwitterOAuthActivity" android:launchMode="singleTask" >-->
-        <activity android:name=".TwitterOAuthActivity" >
+        <activity android:name=".holo.TwitterOAuthActivity" >
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />

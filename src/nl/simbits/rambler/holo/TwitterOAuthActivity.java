@@ -1,4 +1,4 @@
-package nl.simbits.rambler;
+package nl.simbits.rambler.holo;
 
 import java.io.IOException;
 
@@ -24,6 +24,8 @@ import com.google.api.client.auth.oauth.OAuthGetTemporaryToken;
 import com.google.api.client.auth.oauth.OAuthHmacSigner;
 import com.google.api.client.http.apache.ApacheHttpTransport;
 
+import nl.simbits.rambler.R;
+import nl.simbits.rambler.Secrets;
 import nl.simbits.rambler.social.TwitterUtilities;
 
 public class TwitterOAuthActivity extends Activity {

@@ -23,7 +23,6 @@ import com.facebook.SessionState;
 
 import nl.simbits.rambler.R;
 import nl.simbits.rambler.Secrets;
-import nl.simbits.rambler.TwitterOAuthActivity;
 import nl.simbits.rambler.social.SocialService;
 
 public class MainActivity extends Activity {

@@ -24,6 +24,7 @@ import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 
+import nl.simbits.rambler.holo.TwitterOAuthActivity;
 import nl.simbits.rambler.social.SocialService;
 
 public class MainTabActivity extends Activity
