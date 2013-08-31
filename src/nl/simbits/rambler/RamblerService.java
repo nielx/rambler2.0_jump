@@ -204,10 +204,10 @@ public class RamblerService extends Service
 	private SavitzkyGolayStepDetector createSGJumpStepDetector(SharedPreferences prefs, ShoeEventListener listener) {
 		int buffer = prefs.getInt("SGSampleBuffer", SG_SAMPLE_BUFFER);
 		int window = prefs.getInt("SGWindow", SG_WINDOW);
-		int pos = prefs.getInt("SGPosThreshold", 30);
-		int neg = prefs.getInt("SGNegThreshold", -30);
-		int jumpWindow = prefs.getInt("SGJumpEventWindow", 1000);
-		int interval = prefs.getInt("SGJumpInterval", 3000);
+		int pos = Integer.valueOf(prefs.getString("SGPosThreshold", "30"));
+		int neg = Integer.valueOf(prefs.getString("SGNegThreshold", "-30"));
+		int jumpWindow = Integer.valueOf(prefs.getString("SGJumpEventWindow", "1000"));
+		int interval = Integer.valueOf(prefs.getString("SGJumpInterval", "3000"));
 
 		Log.d(TAG, "Set SG Samples: " + buffer);
 		Log.d(TAG, "Set SG Window: " + window);

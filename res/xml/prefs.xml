@@ -6,8 +6,34 @@
 
         <EditTextPreference
             android:defaultValue="30"
-            android:key="bogus_treshold"
+            android:key="SGPosTreshold"
             android:title="Positive Treshold"
             android:inputType="number" />
+
+        <EditTextPreference
+            android:defaultValue="-30"
+            android:key="SGNegThreshold"
+            android:title="Negative Treshold"
+            android:inputType="number" />
+
+        <EditTextPreference
+            android:defaultValue="1000"
+            android:key="SGJumpEventWindow"
+            android:title="Jump event window (in ms)"
+            android:inputType="number" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Feedback"
+        android:key="rambler_feedback">
+
+        <CheckBoxPreference
+            android:title="Vibrate on step"
+            android:key="SDVibrateOnStep" />
+
+        <CheckBoxPreference
+            android:title="Vibrate on jump"
+            android:key="SDVibrateOnJump" />
     </PreferenceCategory>
 </PreferenceScreen>

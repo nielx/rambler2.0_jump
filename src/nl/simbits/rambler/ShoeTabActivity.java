@@ -50,9 +50,9 @@ public class ShoeTabActivity extends Activity {
     }
 	
 	private void fillFromPreferences() {
-		mPosThreshold.setText("" + mPreferences.getInt("SGPosThreshold", 30));
-		mNegThreshold.setText("" + mPreferences.getInt("SGNegThreshold", -30));
-		mJumpEventWindow.setText("" + mPreferences.getInt("SGJumpEventWindow", 1000));
+		mPosThreshold.setText(mPreferences.getString("SGPosThreshold", "30"));
+		mNegThreshold.setText(mPreferences.getString("SGNegThreshold", "-30"));
+		mJumpEventWindow.setText(mPreferences.getString("SGJumpEventWindow", "1000"));
 		mVibrateOnStep.setChecked(mPreferences.getBoolean("SDVibrateOnStep", false));
 		mVibrateOnJump.setChecked(mPreferences.getBoolean("SDVibrateOnJump", false));
 	}
@@ -76,14 +76,14 @@ public class ShoeTabActivity extends Activity {
 	        	
 	        	case R.id.ShoeDetectApplyButton: {
 	        		try {
-	        			int pos = Integer.parseInt(((TextView)mPosThreshold).getText().toString());
-	        			int neg = Integer.parseInt(((TextView)mNegThreshold).getText().toString());
-	        			int eventWindow = Integer.parseInt(((TextView)mJumpEventWindow).getText().toString());
+	        			String pos = ((TextView)mPosThreshold).getText().toString();
+	        			String neg = ((TextView)mNegThreshold).getText().toString();
+	        			String eventWindow = ((TextView)mJumpEventWindow).getText().toString();
 	        			
 	        			Editor editor = mPreferences.edit();
-	        			editor.putInt("SGPosThreshold", pos);
-	        			editor.putInt("SGNegThreshold", neg);
-	        			editor.putInt("SGJumpEventWindow", eventWindow);
+	        			editor.putString("SGPosThreshold", pos);
+	        			editor.putString("SGNegThreshold", neg);
+	        			editor.putString("SGJumpEventWindow", eventWindow);
 	        			editor.commit();
 
 	        		} catch (NumberFormatException e) {
