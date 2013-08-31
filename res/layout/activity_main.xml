@@ -21,7 +21,7 @@
         android:background="@android:color/background_light">
 
         <TextView
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_width="match_parent"
             android:text="Connections"
             style="?android:attr/listSeparatorTextViewStyle"/>
@@ -126,5 +126,28 @@
                 android:enabled="false"/>
 
         </LinearLayout>
+
+        <View style="@style/Divider"/>
+
+        <!-- Tools -->
+        <TextView
+            android:layout_height="48dp"
+            android:layout_width="match_parent"
+            android:text="Tools"
+            style="?android:attr/listSeparatorTextViewStyle"/>
+
+        <Button
+            android:id="@+id/settings_button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Settings"
+            android:gravity="left|center_vertical"
+            android:background="?android:selectableItemBackground"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
+        <View style="@style/Divider"/>
+
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

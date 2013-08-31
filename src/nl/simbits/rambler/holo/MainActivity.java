@@ -1,6 +1,7 @@
 package nl.simbits.rambler.holo;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -93,6 +95,19 @@ public class MainActivity extends Activity {
         startService(twitterStatusIntent);
 
         mTwitterToggle.setOnClickListener(mTwitterLoginButtonClick);
+
+        // Hook up Settings
+        Button settingsButton = (Button)findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SettingsFragment fragment = new SettingsFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.add(R.id.main_content, fragment);
+                transaction.commit();
+                mDrawerLayout.closeDrawers();
+            }
+        });
 
     }
 

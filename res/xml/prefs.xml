@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:title="@string/titleUsername"
-            android:summary="@string/summaryUsername" android:key="username"></EditTextPreference>
+    <PreferenceCategory
+        android:title="Detection filter parameters"
+        android:key="rambler_detection_filter">
+
+        <EditTextPreference
+            android:defaultValue="30"
+            android:key="bogus_treshold"
+            android:title="Positive Treshold"
+            android:inputType="number" />
+    </PreferenceCategory>
 </PreferenceScreen>
