@@ -45,7 +45,8 @@
                 android:text="Checking connection"
                 android:gravity="center_vertical"
                 android:layout_weight="1"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:freezesText="true"/>
 
             <ToggleButton
                 android:id="@+id/facebook_togglebutton"
@@ -79,7 +80,8 @@
                 android:text="Checking connection"
                 android:gravity="center_vertical"
                 android:layout_weight="1"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:freezesText="true"/>
 
             <ToggleButton
                 android:id="@+id/twitter_togglebutton"
@@ -113,7 +115,8 @@
                 android:gravity="center_vertical"
                 android:layout_weight="1"
                 android:text="Trying to connect to Rambler"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:freezesText="true"/>
 
             <ToggleButton
                 android:id="@+id/bluetooth_togglebutton"

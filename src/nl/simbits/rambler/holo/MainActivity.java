@@ -39,6 +39,15 @@ public class MainActivity extends Activity {
     public static final String TAG = "MainActivity";
     public static final int BLUETOOTH_REQUEST_ENABLE = 1;
 
+    // Save the state of the buttons
+    final static String KEY_SHOE_CONNECTED = "KEY_SHOE_CONNECTED";
+    final static String KEY_BLUETOOTH_TOGGLE_ENABLED = "KEY_BLUETOOTH_TOGGLE_ENABLED";
+    final static String KEY_FACEBOOK_AUTHENTICATED = "KEY_FACEBOOK_AUTHENTICATED";
+    final static String KEY_FACEBOOK_TOGGLE_ENABLED = "KEY_FACEBOOK_TOGGLE_ENABLED";
+    final static String KEY_TWITTER_AUTHENTICATED = "KEY_TWITTER_AUTHENTICATED";
+    final static String KEY_TWITTER_TOGGLE_ENABLED = "KEY_TWITTER_TOGGLE_ENABLED";
+
+
     // Actionbar
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -83,6 +92,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Crashlytics.start(this);
 
+        if (savedInstanceState != null)
+            Log.d(TAG, savedInstanceState.toString());
+        else
+            Log.d(TAG, "No saved instance state");
         setContentView(R.layout.activity_main);
 
         // Enable the action bar app icon to toggle the settings
@@ -112,6 +125,13 @@ public class MainActivity extends Activity {
         mFacebookText = (TextView)findViewById(R.id.facebook_message);
         mFacebookToggle = (ToggleButton)findViewById(R.id.facebook_togglebutton);
 
+        if (savedInstanceState != null) {
+            mFacebookAuthenticated = savedInstanceState.getBoolean(KEY_FACEBOOK_AUTHENTICATED,
+                    false);
+            mFacebookToggle.setEnabled(savedInstanceState.getBoolean(KEY_FACEBOOK_TOGGLE_ENABLED,
+                    false));
+        }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mFacebookStatusReceiver, new IntentFilter(SocialService.FACEBOOK_STATUS));
 
@@ -124,6 +144,12 @@ public class MainActivity extends Activity {
         // Twitter
         mTwitterText = (TextView)findViewById(R.id.twitter_message);
         mTwitterToggle = (ToggleButton)findViewById(R.id.twitter_togglebutton);
+
+        if (savedInstanceState != null) {
+            mTwitterAuthenticated = savedInstanceState.getBoolean(KEY_TWITTER_AUTHENTICATED, false);
+            mTwitterToggle.setEnabled(savedInstanceState.getBoolean(KEY_TWITTER_AUTHENTICATED,
+                    false));
+        }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mTwitterStatusReceiver, new IntentFilter(SocialService.TWITTER_STATUS));
@@ -138,6 +164,12 @@ public class MainActivity extends Activity {
         mBluetoothText = (TextView)findViewById(R.id.bluetooth_message);
         mBluetoothToggle = (ToggleButton)findViewById(R.id.bluetooth_togglebutton);
         mBluetoothToggle.setOnClickListener(mBluetoothButtonClick);
+
+        if (savedInstanceState != null) {
+            mShoeConnected = savedInstanceState.getBoolean(KEY_SHOE_CONNECTED, false);
+            mBluetoothToggle.setEnabled(savedInstanceState.getBoolean(KEY_BLUETOOTH_TOGGLE_ENABLED,
+                    false));
+        }
 
         // Bluetooth wiring
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -230,9 +262,21 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_BLUETOOTH_TOGGLE_ENABLED, mBluetoothToggle.isEnabled());
+        outState.putBoolean(KEY_FACEBOOK_AUTHENTICATED, mFacebookAuthenticated);
+        outState.putBoolean(KEY_FACEBOOK_TOGGLE_ENABLED, mFacebookToggle.isEnabled());
+        outState.putBoolean(KEY_TWITTER_AUTHENTICATED, mTwitterAuthenticated);
+        outState.putBoolean(KEY_TWITTER_TOGGLE_ENABLED, mTwitterToggle.isEnabled());
+        outState.putBoolean(KEY_SHOE_CONNECTED, mShoeConnected);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
+        unregisterReceiver(mBroadcastReceiver);
         if (mServiceBound) {
             getApplicationContext().unbindService(mServiceConnection);
             mServiceBound = false;
@@ -308,7 +352,8 @@ public class MainActivity extends Activity {
                                 }
 
                                 // Call the service to further handle the session changes
-                                Intent facebookStatusIntent = new Intent(MainActivity.this, SocialService.class);
+                                Intent facebookStatusIntent = new Intent(MainActivity.this,
+                                        SocialService.class);
                                 facebookStatusIntent.setAction(SocialService.FACEBOOK_QUERY_STATUS);
                                 startService(facebookStatusIntent);
                             }
@@ -371,7 +416,8 @@ public class MainActivity extends Activity {
                 String address = extras.getString("address");
 
                 Log.i(TAG, "Received broadcast: " + intent.toString());
-                Log.i(TAG, "extras: state: " + state + " (" + BluetoothSPPConnector.stateToString(state) + "), address: " + address);
+                Log.i(TAG, "extras: state: " + state + " (" +
+                        BluetoothSPPConnector.stateToString(state) + "), address: " + address);
 
                 switch (state) {
                     case BluetoothSPPConnector.BT_CONNECTED: {
@@ -385,6 +431,13 @@ public class MainActivity extends Activity {
                         mBluetoothText.setText("Bluetooth not enabled");
                         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                         startActivityForResult(enableIntent, BLUETOOTH_REQUEST_ENABLE);
+                        break;
+                    }
+                    case BluetoothSPPConnector.BT_NOT_CONNECTED: {
+                        mBluetoothText.setText("Not connected");
+                        mBluetoothToggle.setEnabled(true);
+                        mBluetoothToggle.setChecked(false);
+                        mShoeConnected = false;
                         break;
                     }
                     default: {
@@ -412,6 +465,7 @@ public class MainActivity extends Activity {
                     mBluetoothText.setText("Not connected");
                     mBluetoothToggle.setChecked(false);
                     mBluetoothToggle.setEnabled(true);
+                    mShoeConnected = false;
                     mService.stopBluetoothConnection();
                 }
             }
