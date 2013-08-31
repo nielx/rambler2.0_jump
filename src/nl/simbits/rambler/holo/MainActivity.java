@@ -2,12 +2,16 @@ package nl.simbits.rambler.holo;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.crashlytics.android.Crashlytics;
@@ -23,23 +28,56 @@ import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 
+import nl.simbits.rambler.BluetoothSPPConnector;
 import nl.simbits.rambler.R;
+import nl.simbits.rambler.RamblerService;
 import nl.simbits.rambler.Secrets;
+import nl.simbits.rambler.ServiceTools;
 import nl.simbits.rambler.social.SocialService;
 
 public class MainActivity extends Activity {
     public static final String TAG = "MainActivity";
+    public static final int BLUETOOTH_REQUEST_ENABLE = 1;
 
+    // Actionbar
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    // Facebook
     private Boolean mFacebookAuthenticated = false;
     private TextView mFacebookText;
     private ToggleButton mFacebookToggle;
 
+    // Twitter
     private Boolean mTwitterAuthenticated = false;
     private TextView mTwitterText;
     private ToggleButton mTwitterToggle;
+
+    // Bluetooth UI
+    private TextView mBluetoothText;
+    private ToggleButton mBluetoothToggle;
+    private BluetoothAdapter mBluetoothAdapter;
+
+    // Bluetooth Broadcast
+    private boolean mShoeConnected = false;
+    private BroadcastReceiver mBroadcastReceiver;
+
+    // RamblerService
+    private boolean mServiceBound;
+    private RamblerService mService;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = ((RamblerService.ServiceBinder)service).getService();
+            mServiceBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+            mServiceBound = false;
+            mBluetoothToggle.setEnabled(false);
+        }
+    };
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +134,24 @@ public class MainActivity extends Activity {
 
         mTwitterToggle.setOnClickListener(mTwitterLoginButtonClick);
 
+        // Bluetooth UI
+        mBluetoothText = (TextView)findViewById(R.id.bluetooth_message);
+        mBluetoothToggle = (ToggleButton)findViewById(R.id.bluetooth_togglebutton);
+        mBluetoothToggle.setOnClickListener(mBluetoothButtonClick);
+
+        // Bluetooth wiring
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            mBluetoothText.setText("Bluetooth is not available");
+            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+        }
+
+        mBroadcastReceiver = new BluetoothConnectionReceiver();
+
+        IntentFilter filter = new IntentFilter(BluetoothSPPConnector.BROADCAST_INTENT_BLUETOOTH);
+        registerReceiver(mBroadcastReceiver, filter);
+
+
         // Hook up Settings
         Button settingsButton = (Button)findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +166,21 @@ public class MainActivity extends Activity {
         });
 
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Intent intent = new Intent(this, RamblerService.class);
+        if (ServiceTools.isServiceRunning(this) == false){
+            Log.d(TAG,"-->service will be started.");
+            startService(intent);
+        } else {
+            Log.d(TAG,"-->service is running.");
+        }
+        getApplicationContext().bindService(intent, mServiceConnection, 0);
+    }
+
 
     @Override
     protected void onResume() {
@@ -161,6 +232,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if (mServiceBound) {
+            getApplicationContext().unbindService(mServiceConnection);
+            mServiceBound = false;
+        }
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mFacebookStatusReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mTwitterStatusReceiver);
     }
@@ -281,5 +358,64 @@ public class MainActivity extends Activity {
         }
     };
 
+    /* Bluetooth methods */
+    private class BluetoothConnectionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BluetoothSPPConnector.BROADCAST_INTENT_BLUETOOTH)) {
+                Bundle extras = intent.getExtras();
+
+                int state = extras.getInt("state");
+                String stateText = extras.getString("state_text");
+                String name = extras.getString("name");
+                String address = extras.getString("address");
+
+                Log.i(TAG, "Received broadcast: " + intent.toString());
+                Log.i(TAG, "extras: state: " + state + " (" + BluetoothSPPConnector.stateToString(state) + "), address: " + address);
+
+                switch (state) {
+                    case BluetoothSPPConnector.BT_CONNECTED: {
+                        mBluetoothText.setText("Connected to " + name);
+                        mBluetoothToggle.setChecked(true);
+                        mBluetoothToggle.setEnabled(true);
+                        mShoeConnected = true;
+                        break;
+                    }
+                    case BluetoothSPPConnector.BT_NOT_ENABLED: {
+                        mBluetoothText.setText("Bluetooth not enabled");
+                        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        startActivityForResult(enableIntent, BLUETOOTH_REQUEST_ENABLE);
+                        break;
+                    }
+                    default: {
+                        mBluetoothText.setText("Unable to connect with " + name);
+                        mBluetoothToggle.setChecked(false);
+                        mBluetoothToggle.setEnabled(true);
+                        mShoeConnected = false;
+                    }
+                }
+            }
+        }
+    }
+
+    private View.OnClickListener mBluetoothButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (mServiceBound && mService != null) {
+                if (!mShoeConnected) {
+                    Log.d(TAG, "start bluetooth connection");
+                    mBluetoothText.setText("Connecting...");
+                    mBluetoothToggle.setEnabled(false);
+                    mService.startBluetoothConnection();
+                } else {
+                    Log.d(TAG, "stop bluetooth connection");
+                    mBluetoothText.setText("Not connected");
+                    mBluetoothToggle.setChecked(false);
+                    mBluetoothToggle.setEnabled(true);
+                    mService.stopBluetoothConnection();
+                }
+            }
+        }
+    };
 
 }

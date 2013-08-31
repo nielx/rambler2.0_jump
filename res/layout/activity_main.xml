@@ -116,7 +116,7 @@
                 android:textStyle="italic" />
 
             <ToggleButton
-                android:id="@+id/togglebutton_bluetooth_connect"
+                android:id="@+id/bluetooth_togglebutton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:textOn="On"
