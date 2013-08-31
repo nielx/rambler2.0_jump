@@ -22,6 +22,8 @@ import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 
 import nl.simbits.rambler.R;
+import nl.simbits.rambler.Secrets;
+import nl.simbits.rambler.TwitterOAuthActivity;
 import nl.simbits.rambler.social.SocialService;
 
 public class MainActivity extends Activity {
@@ -33,6 +35,10 @@ public class MainActivity extends Activity {
     private Boolean mFacebookAuthenticated = false;
     private TextView mFacebookText;
     private ToggleButton mFacebookToggle;
+
+    private Boolean mTwitterAuthenticated = false;
+    private TextView mTwitterText;
+    private ToggleButton mTwitterToggle;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +69,7 @@ public class MainActivity extends Activity {
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        // Load other UI elements
+        // Facebook
         mFacebookText = (TextView)findViewById(R.id.facebook_message);
         mFacebookToggle = (ToggleButton)findViewById(R.id.facebook_togglebutton);
 
@@ -75,6 +81,20 @@ public class MainActivity extends Activity {
         startService(facebookStatusIntent);
 
         mFacebookToggle.setOnClickListener(mFacebookLoginButtonClick);
+
+        // Twitter
+        mTwitterText = (TextView)findViewById(R.id.twitter_message);
+        mTwitterToggle = (ToggleButton)findViewById(R.id.twitter_togglebutton);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mTwitterStatusReceiver, new IntentFilter(SocialService.TWITTER_STATUS));
+
+        Intent twitterStatusIntent = new Intent(this, SocialService.class);
+        twitterStatusIntent.setAction(SocialService.TWITTER_QUERY_STATUS);
+        startService(twitterStatusIntent);
+
+        mTwitterToggle.setOnClickListener(mTwitterLoginButtonClick);
+
     }
 
     @Override
@@ -108,6 +128,20 @@ public class MainActivity extends Activity {
         Session fb_session = Session.getActiveSession();
         if (fb_session != null)
             fb_session.onActivityResult(this, requestCode, resultCode, data);
+
+        switch(requestCode) {
+            case Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE: {
+                mTwitterToggle.setEnabled(false);
+                mTwitterToggle.setChecked(true);
+                mTwitterText.setText("Logging in...");
+
+                Intent twitterStatusIntent = new Intent(this, SocialService.class);
+                twitterStatusIntent.setAction(SocialService.TWITTER_QUERY_STATUS);
+                startService(twitterStatusIntent);
+                break;
+            }
+        }
+
     }
 
     /* Facebook methods */
@@ -183,5 +217,48 @@ public class MainActivity extends Activity {
                         }));
 
     }
+
+    /* Twitter methods */
+    private BroadcastReceiver mTwitterStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received new Twitter status");
+
+            if (intent.getBooleanExtra("authenticated", false)) {
+                Log.d(TAG, "Twitter Status: authenticated");
+                mTwitterText.setText("Connected as " + intent.getStringExtra("name"));
+                mTwitterToggle.setEnabled(true);
+                mTwitterToggle.setChecked(true);
+                mTwitterAuthenticated = true;
+            } else {
+                Log.d(TAG, "Twitter Status: not authenticated");
+                mTwitterText.setText("Not connected");
+                mTwitterToggle.setEnabled(true);
+                mTwitterToggle.setChecked(false);
+                mTwitterAuthenticated = false;
+            }
+        }
+    };
+
+    private View.OnClickListener mTwitterLoginButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (mTwitterAuthenticated) {
+                mTwitterToggle.setEnabled(false);
+                mTwitterText.setText("Logging out...");
+
+                // Use the SocialService to Log Out
+                Intent cancelTwitterIntent = new Intent(MainActivity.this, SocialService.class);
+                cancelTwitterIntent.setAction(SocialService.TWITTER_LOGOUT);
+                startService(cancelTwitterIntent);
+
+            } else {
+                startActivityForResult(new Intent().setClass(MainActivity.this,
+                        TwitterOAuthActivity.class),
+                        Secrets.TWITTER_AUTHORIZE_ACTIVITY_RESULT_CODE);
+            }
+        }
+    };
+
 
 }
