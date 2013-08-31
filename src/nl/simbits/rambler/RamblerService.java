@@ -26,6 +26,7 @@ import java.util.ListIterator;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import nl.simbits.rambler.holo.MainActivity;
 import nl.simbits.rambler.social.FacebookEvent;
 import nl.simbits.rambler.social.FacebookUtilities;
 import nl.simbits.rambler.social.TwitterUtilities;
@@ -76,7 +77,7 @@ public class RamblerService extends Service
     
     void startInForeground()
     {
-        Intent intent = new Intent(this, Rambler.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
 
@@ -161,7 +162,7 @@ public class RamblerService extends Service
     }
 
     public void updateNotification(String msg) {
-        Intent intent = new Intent(this, Rambler.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
 
