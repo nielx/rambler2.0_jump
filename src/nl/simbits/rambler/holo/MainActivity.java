@@ -158,6 +158,13 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mFacebookStatusReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mTwitterStatusReceiver);
+    }
+
     /* Facebook methods */
     private BroadcastReceiver mFacebookStatusReceiver = new BroadcastReceiver() {
         @Override
