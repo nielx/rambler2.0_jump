@@ -257,6 +257,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     stopService(new Intent(MainActivity.this, RamblerService.class));
+                    EventAdapter.getInstance().clear();
                     finish();
                 }
             });
