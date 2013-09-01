@@ -25,7 +25,10 @@ public class EventListFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         Event event = (Event)getListAdapter().getItem(position);
         if (event.getLocation() != null) {
-            String uri = String.format(Locale.ENGLISH, "geo:%f,%f", event.getLocation().getLatitude(),
+            String uri = String.format(Locale.ENGLISH, "geo:%f,%f?z=17&q=%f,%f",
+                    event.getLocation().getLatitude(),
+                    event.getLocation().getLongitude(),
+                    event.getLocation().getLatitude(),
                     event.getLocation().getLongitude());
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             getActivity().startActivity(intent);
