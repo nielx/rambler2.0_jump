@@ -2,6 +2,7 @@ package nl.simbits.rambler.holo;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -28,11 +29,14 @@ import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 
+import java.util.List;
+
 import nl.simbits.rambler.BluetoothSPPConnector;
 import nl.simbits.rambler.R;
 import nl.simbits.rambler.RamblerService;
 import nl.simbits.rambler.Secrets;
 import nl.simbits.rambler.ServiceTools;
+import nl.simbits.rambler.database.EventAdapter;
 import nl.simbits.rambler.social.SocialService;
 
 public class MainActivity extends Activity {
@@ -191,12 +195,19 @@ public class MainActivity extends Activity {
             public void onClick(View view) {
                 SettingsFragment fragment = new SettingsFragment();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.add(R.id.main_content, fragment);
+                transaction.replace(R.id.main_content, fragment);
+                transaction.addToBackStack(null);
                 transaction.commit();
                 mDrawerLayout.closeDrawers();
             }
         });
 
+        // Set up initial fragment
+        ListFragment fragment = new ListFragment();
+        fragment.setListAdapter(EventAdapter.getInstance());
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.main_content, fragment);
+        transaction.commit();
     }
 
     @Override
