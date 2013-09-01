@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
-import nl.simbits.rambler.RamblerService;
 
 public class Rambler extends TabActivity
 {
@@ -69,7 +68,7 @@ public class Rambler extends TabActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.itemExit:
+            case R.id.item_exit:
                 stopService(new Intent(this, RamblerService.class));
                 finish();
                 break;

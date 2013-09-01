@@ -26,6 +26,8 @@ import java.util.ListIterator;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import nl.simbits.rambler.database.Event;
+import nl.simbits.rambler.database.EventAdapter;
 import nl.simbits.rambler.holo.MainActivity;
 import nl.simbits.rambler.social.FacebookEvent;
 import nl.simbits.rambler.social.FacebookUtilities;
@@ -395,10 +397,15 @@ public class RamblerService extends Service
                    break;
                case SHOE_RECEIVED_STEP: 
                    mStepsWalked++;
+                   EventAdapter.getInstance().addItem(new Event(Event.EventType.STEP,
+                           "step " + String.valueOf(mStepsWalked)));
                    break;
                case SHOE_RECEIVED_JUMPS: 
                    Log.d(TAG, "Rambler received jumps: " + msg.arg1);
                    Toast.makeText(getApplicationContext(), "Rambler received jumps: " + msg.arg1, Toast.LENGTH_SHORT).show();
+
+                   EventAdapter.getInstance().addItem(new Event(Event.EventType.STEP,
+                           "jumps " + String.valueOf(msg.arg1)));
 
                    if (mLastBestLocation == null) {
                 	   Log.i(TAG, "No location yet");
