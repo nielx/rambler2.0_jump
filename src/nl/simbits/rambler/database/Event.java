@@ -11,8 +11,7 @@ public class Event {
     public enum EventType {
         FACEBOOK,
         TWITTER,
-        MAP,
-        STEP
+        BLUETOOTH
     }
 
     private String mEventMessage;

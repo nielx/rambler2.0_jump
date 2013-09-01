@@ -123,6 +123,9 @@ public class EventAdapter extends BaseAdapter {
             case TWITTER:
                 image.setImageResource(R.drawable.logo_twitter);
                 break;
+            case BLUETOOTH:
+                image.setImageResource(R.drawable.ic_device_access_bluetooth_connected);
+                break;
         }
 
         // Set Text

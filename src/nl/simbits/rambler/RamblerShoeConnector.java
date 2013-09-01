@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 
+import nl.simbits.rambler.database.Event;
+import nl.simbits.rambler.database.EventAdapter;
+
 public class RamblerShoeConnector extends Thread{
 	public static final String TAG = "RamblerShoeConnector";
 	
@@ -107,8 +110,13 @@ public class RamblerShoeConnector extends Thread{
 	        cancel();
 	        return;
 	    }
-	    
-	    try {
+
+        // For the UI, sorry, I find it horrible that this has to invade here too, instead of
+        // at a nice broadcast listener. Unfortunately the state of the connection is
+        EventAdapter.getInstance().addItem(new Event(Event.EventType.BLUETOOTH,
+                "Connection established", null, null));
+
+        try {
 	        inStream = mConnector.getInputStream();
 	        InputStreamReader inStreamReader = new InputStreamReader(inStream);
 	        BufferedReader inBuffer = new BufferedReader(inStreamReader);
