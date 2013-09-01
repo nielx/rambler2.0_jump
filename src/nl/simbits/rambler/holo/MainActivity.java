@@ -1,12 +1,14 @@
 package nl.simbits.rambler.holo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -239,7 +241,31 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+        if (mDrawerToggle.onOptionsItemSelected(item))
+            return true;
+
+        if (item.getItemId() == R.id.item_exit) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Stop Rambler");
+            builder.setMessage("Are you sure you want disconnect form the shoe and stop listening for steps?");
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            builder.setPositiveButton("Quit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    stopService(new Intent(MainActivity.this, RamblerService.class));
+                    finish();
+                }
+            });
+            builder.show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
