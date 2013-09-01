@@ -9,7 +9,8 @@
     <FrameLayout
         android:id="@+id/main_content"
         android:layout_height="match_parent"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        android:paddingTop="16dp"/>
 
     <!-- Drawer -->
     <LinearLayout

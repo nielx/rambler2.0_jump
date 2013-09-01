@@ -1,6 +1,5 @@
 package nl.simbits.rambler.database;
 
-import android.R;
 import android.content.Context;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -10,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import nl.simbits.rambler.R;
 
 public class EventAdapter extends BaseAdapter {
 
@@ -66,7 +67,7 @@ public class EventAdapter extends BaseAdapter {
         if (currentView == null) {
             LayoutInflater inflater = (LayoutInflater) parent.getContext()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            currentView = inflater.inflate(R.layout.simple_list_item_1, null);
+            currentView = inflater.inflate(R.layout.row_event, null);
         }
 
         // Set Text

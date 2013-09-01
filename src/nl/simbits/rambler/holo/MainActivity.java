@@ -3,7 +3,6 @@ package nl.simbits.rambler.holo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
-import android.app.ListFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -204,7 +203,7 @@ public class MainActivity extends Activity {
         });
 
         // Set up initial fragment
-        ListFragment fragment = new ListFragment();
+        EventListFragment fragment = new EventListFragment();
         fragment.setListAdapter(EventAdapter.getInstance());
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.main_content, fragment);
