@@ -20,21 +20,6 @@
                  android:name=".RamblerApplication"
                  android:theme="@android:style/Theme.Holo.Light">
 
-        <activity android:name="Rambler"
-                  android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".PrefsActivity"
-                  android:label="@string/titlePrefs" />
-  
-        <activity android:name=".ShoeTabActivity" />
-        <activity android:name=".MainTabActivity" />
-        <activity android:name=".MapTabActivity" />
-
         <activity android:name=".BluetoothDevicesDialog"
                   android:label="select device"
                   android:theme="@android:style/Theme.Dialog"
@@ -44,7 +29,6 @@
         <activity android:name=".holo.TwitterOAuthActivity" >
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 			</intent-filter>
 		</activity>
@@ -58,6 +42,7 @@
             android:theme="@android:style/Theme.Holo.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
