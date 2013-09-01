@@ -29,8 +29,6 @@ import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 
-import java.util.List;
-
 import nl.simbits.rambler.BluetoothSPPConnector;
 import nl.simbits.rambler.R;
 import nl.simbits.rambler.RamblerService;
@@ -50,7 +48,6 @@ public class MainActivity extends Activity {
     final static String KEY_FACEBOOK_TOGGLE_ENABLED = "KEY_FACEBOOK_TOGGLE_ENABLED";
     final static String KEY_TWITTER_AUTHENTICATED = "KEY_TWITTER_AUTHENTICATED";
     final static String KEY_TWITTER_TOGGLE_ENABLED = "KEY_TWITTER_TOGGLE_ENABLED";
-
 
     // Actionbar
     private DrawerLayout mDrawerLayout;

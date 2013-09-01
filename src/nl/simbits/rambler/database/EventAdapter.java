@@ -28,9 +28,6 @@ public class EventAdapter extends BaseAdapter {
         super();
         mItems = new ArrayList<Event>();
         mHander = new Handler();
-
-        Event e = new Event(Event.EventType.STEP, "Testmessage");
-        mItems.add(e);
     }
 
     // Insides (data management)
