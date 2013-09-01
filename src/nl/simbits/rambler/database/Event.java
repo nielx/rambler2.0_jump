@@ -1,10 +1,7 @@
 package nl.simbits.rambler.database;
 
 
-import android.graphics.drawable.Drawable;
-
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import android.graphics.Bitmap;
 
 import java.util.Date;
 
@@ -22,7 +19,7 @@ public class Event {
     private EventType mEventType;
     private RamblerLocation mLocation;
     private String mPictureUrl;
-    private Drawable mPicture;
+    private Bitmap mPicture;
     private Date mDate;
 
     public Event(EventType type, String message, RamblerLocation location, String pictureUrl) {
@@ -51,5 +48,13 @@ public class Event {
 
     public String getPictureUrl() {
         return mPictureUrl;
+    }
+
+    public void setPicture(Bitmap bitmap) {
+        mPicture = bitmap;
+    }
+
+    public Bitmap getPicture() {
+        return mPicture;
     }
 }

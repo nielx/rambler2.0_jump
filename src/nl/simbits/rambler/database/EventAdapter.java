@@ -1,7 +1,10 @@
 package nl.simbits.rambler.database;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +12,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BinaryHttpResponseHandler;
+
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
 import nl.simbits.rambler.R;
 
 public class EventAdapter extends BaseAdapter {
+    private static final String TAG = "EventAdapter";
 
     // Singleton
     private static EventAdapter gEventAdapter;
@@ -37,14 +45,48 @@ public class EventAdapter extends BaseAdapter {
     final Handler mHander;
 
     public void addItem(final Event event) {
-        // Enqueue work on the main thread
-        mHander.post(new Runnable() {
-            @Override
-            public void run() {
-                mItems.add(event);
-                notifyDataSetChanged();
-            }
-        });
+        if (event.getPictureUrl() != null) {
+            // We have to get the picture first
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(event.getPictureUrl(), new BinaryHttpResponseHandler() {
+                @Override
+                public void onFailure(Throwable throwable, byte[] bytes) {
+                    Log.e(TAG, "Unable to fetch the picture for " + event.getMessage());
+                    mHander.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mItems.add(event);
+                            notifyDataSetChanged();
+                        }
+                    });
+                }
+
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+                    Bitmap bitmap = BitmapFactory.decodeStream(is);
+                    event.setPicture(bitmap);
+
+                    mHander.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mItems.add(event);
+                            notifyDataSetChanged();
+                        }
+                    });
+                }
+            });
+        } else {
+
+            // Enqueue work on the main thread
+            mHander.post(new Runnable() {
+                @Override
+                public void run() {
+                    mItems.add(event);
+                    notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     //
@@ -90,6 +132,13 @@ public class EventAdapter extends BaseAdapter {
         // Print date
         TextView date = (TextView) currentView.findViewById(R.id.event_date);
         date.setText(mItems.get(position).getDate().toLocaleString());
+
+        // If there is a picture, show it
+        if (mItems.get(position).getPicture() != null) {
+            ImageView picture = (ImageView) currentView.findViewById(R.id.event_picture);
+            picture.setAdjustViewBounds(true);
+            picture.setImageBitmap(mItems.get(position).getPicture());
+        }
 
         return currentView;
     }

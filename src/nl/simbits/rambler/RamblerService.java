@@ -479,7 +479,7 @@ public class RamblerService extends Service
                                mFacebook.postPhoto("Just arrived at " + addr, mapURL, true);
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.FACEBOOK,
                                        "Posted photo of the current location " + addr,
-                                       null, mapURLBig));
+                                       mLastBestLocation, mapURLBig));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting to facebook: " + e.getMessage());
                            }
