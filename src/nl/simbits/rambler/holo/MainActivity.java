@@ -82,6 +82,7 @@ public class MainActivity extends Activity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mService = ((RamblerService.ServiceBinder)service).getService();
             mServiceBound = true;
+            mService.broadcastBluetoothState();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -186,7 +187,6 @@ public class MainActivity extends Activity {
 
         IntentFilter filter = new IntentFilter(BluetoothSPPConnector.BROADCAST_INTENT_BLUETOOTH);
         registerReceiver(mBroadcastReceiver, filter);
-
 
         // Hook up Settings
         Button settingsButton = (Button)findViewById(R.id.settings_button);
