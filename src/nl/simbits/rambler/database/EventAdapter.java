@@ -37,7 +37,7 @@ public class EventAdapter extends BaseAdapter {
     ArrayList<Event> mItems;
     final Handler mHander;
 
-    void addItem(final Event event) {
+    public void addItem(final Event event) {
         // Enqueue work on the main thread
         mHander.post(new Runnable() {
             @Override
@@ -66,17 +66,15 @@ public class EventAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View currentView, ViewGroup parent) {
-        View itemView = null;
         if (currentView == null) {
             LayoutInflater inflater = (LayoutInflater) parent.getContext()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            itemView = inflater.inflate(R.layout.simple_list_item_1, null);
-        } else
-            itemView = currentView;
+            currentView = inflater.inflate(R.layout.simple_list_item_1, null);
+        }
 
         // Set Text
-        TextView text = (TextView) itemView.findViewById(R.id.text1);
+        TextView text = (TextView) currentView.findViewById(R.id.text1);
         text.setText(mItems.get(position).getMessage());
-        return itemView;
+        return currentView;
     }
 }
