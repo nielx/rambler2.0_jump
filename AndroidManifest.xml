@@ -25,7 +25,6 @@
                   android:theme="@android:style/Theme.Dialog"
                   android:configChanges="orientation|keyboardHidden" />
   
-          <!--<activity android:name=".TwitterOAuthActivity" android:launchMode="singleTask" >-->
         <activity android:name=".holo.TwitterOAuthActivity" >
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
