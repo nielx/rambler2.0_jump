@@ -89,6 +89,11 @@ public class EventAdapter extends BaseAdapter {
         }
     }
 
+    public void clear() {
+        mItems = new ArrayList<Event>();
+        notifyDataSetChanged();
+    }
+
     //
     @Override
     public int getCount() {
@@ -139,6 +144,7 @@ public class EventAdapter extends BaseAdapter {
         // If there is a picture, show it
         if (mItems.get(position).getPicture() != null) {
             ImageView picture = (ImageView) currentView.findViewById(R.id.event_picture);
+            picture.setVisibility(View.VISIBLE);
             picture.setAdjustViewBounds(true);
             picture.setImageBitmap(mItems.get(position).getPicture());
         }
