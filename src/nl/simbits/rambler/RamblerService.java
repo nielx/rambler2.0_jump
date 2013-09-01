@@ -386,7 +386,11 @@ public class RamblerService extends Service
                                                                  mStepsWalked).out().toString();
 
                            try {
-                               TwitterUtilities.sendTweetAsync(tweet, mLastBestLocation.getLatitude(), mLastBestLocation.getLongitude());
+                               TwitterUtilities.sendTweetAsync(tweet,
+                                       mLastBestLocation.getLatitude(),
+                                       mLastBestLocation.getLongitude());
+                               EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
+                                       tweet));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            }        
@@ -397,15 +401,10 @@ public class RamblerService extends Service
                    break;
                case SHOE_RECEIVED_STEP: 
                    mStepsWalked++;
-                   EventAdapter.getInstance().addItem(new Event(Event.EventType.STEP,
-                           "step " + String.valueOf(mStepsWalked)));
                    break;
                case SHOE_RECEIVED_JUMPS: 
                    Log.d(TAG, "Rambler received jumps: " + msg.arg1);
                    Toast.makeText(getApplicationContext(), "Rambler received jumps: " + msg.arg1, Toast.LENGTH_SHORT).show();
-
-                   EventAdapter.getInstance().addItem(new Event(Event.EventType.STEP,
-                           "jumps " + String.valueOf(msg.arg1)));
 
                    if (mLastBestLocation == null) {
                 	   Log.i(TAG, "No location yet");
@@ -460,14 +459,18 @@ public class RamblerService extends Service
                            Log.i(TAG, "Received 2 jumps");
                            try {
                                mFacebook.postPhoto("Just arrived at " + addr, mapURL, true);
+                               EventAdapter.getInstance().addItem(new Event(Event.EventType.FACEBOOK,
+                                       "Posted photo of the current location " + addr));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting to facebook: " + e.getMessage());
                            }
                            try {
-                               TwitterUtilities.sendTweetAsync(
-                                       "Just arrived at " + addr +": " + mapURL,
+                               String tweet = "Just arrived at " + addr +": " + mapURL;
+                               TwitterUtilities.sendTweetAsync(tweet,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
+                               EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
+                                       tweet));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            } 
@@ -479,6 +482,9 @@ public class RamblerService extends Service
                                        "I am here: " + mapURL,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
+                               EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
+                                       "Posted location on Twitter"));
+
 
                                /*
                                URL url = new URL(mapURL);

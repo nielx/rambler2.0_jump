@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -70,9 +71,26 @@ public class EventAdapter extends BaseAdapter {
             currentView = inflater.inflate(R.layout.row_event, null);
         }
 
+        // Set image
+        ImageView image = (ImageView)currentView.findViewById(R.id.event_logo);
+
+        switch (mItems.get(position).getType()) {
+            case FACEBOOK:
+                image.setImageResource(R.drawable.logo_facebook);
+                break;
+            case TWITTER:
+                image.setImageResource(R.drawable.logo_twitter);
+                break;
+        }
+
         // Set Text
         TextView text = (TextView) currentView.findViewById(R.id.text1);
         text.setText(mItems.get(position).getMessage());
+
+        // Print date
+        TextView date = (TextView) currentView.findViewById(R.id.event_date);
+        date.setText(mItems.get(position).getDate().toLocaleString());
+
         return currentView;
     }
 }

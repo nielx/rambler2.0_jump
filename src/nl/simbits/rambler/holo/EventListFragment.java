@@ -1,7 +1,6 @@
 package nl.simbits.rambler.holo;
 
 import android.app.ListFragment;
-import android.widget.AbsListView;
 
 public class EventListFragment extends ListFragment {
     @Override
@@ -9,5 +8,6 @@ public class EventListFragment extends ListFragment {
         super.onStart();
         getListView().setDivider(null);
         getListView().setDividerHeight(0);
+        getListView().setClickable(false);
     }
 }
