@@ -10,9 +10,19 @@
         android:layout_marginRight="6dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
-        android:background="@drawable/bg_card">
+        android:background="@drawable/bg_card"
+        android:orientation="horizontal">
 
         <!-- Card Contents go here -->
+
+        <ImageView
+            android:id="@+id/event_logo"
+            android:layout_height="32dp"
+            android:layout_width="32dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:src="@drawable/logo_bluetooth" />
+
         <TextView
             android:id="@+id/text1"
             android:layout_width="match_parent"
