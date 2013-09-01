@@ -390,7 +390,7 @@ public class RamblerService extends Service
                                        mLastBestLocation.getLatitude(),
                                        mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
-                                       tweet));
+                                       tweet, mLastBestLocation));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            }        
@@ -460,17 +460,18 @@ public class RamblerService extends Service
                            try {
                                mFacebook.postPhoto("Just arrived at " + addr, mapURL, true);
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.FACEBOOK,
-                                       "Posted photo of the current location " + addr));
+                                       "Posted photo of the current location " + addr,
+                                       mLastBestLocation));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting to facebook: " + e.getMessage());
                            }
                            try {
-                               String tweet = "Just arrived at " + addr +": " + mapURL;
-                               TwitterUtilities.sendTweetAsync(tweet,
+                               String tweet = "Just arrived at " + addr;
+                               TwitterUtilities.sendTweetAsync(tweet + ": " + mapURL,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
-                                       tweet));
+                                       tweet, mLastBestLocation));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            } 
@@ -483,18 +484,7 @@ public class RamblerService extends Service
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
-                                       "Posted location on Twitter"));
-
-
-                               /*
-                               URL url = new URL(mapURL);
-                               URLConnection ucon = url.openConnection();
-                               TwitterUtilities.sendTweetAsync(mPreferences, 
-                                                               "Stepping around " + addr, 
-                                                               mLastBestLocation.getLatitude(), 
-                                                               mLastBestLocation.getLongitude(), 
-                                                               "place", ucon.getInputStream());
-                               */
+                                       "Posted location on Twitter", mLastBestLocation));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            } 
