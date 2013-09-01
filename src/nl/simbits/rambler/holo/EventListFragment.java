@@ -29,6 +29,9 @@ public class EventListFragment extends ListFragment {
                     event.getLocation().getLongitude());
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             getActivity().startActivity(intent);
+        } else if (event.getPictureUrl() != null) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.getPictureUrl()));
+            getActivity().startActivity(intent);
         } else {
             Toast.makeText(getActivity(), "No location available", Toast.LENGTH_SHORT).show();
         }

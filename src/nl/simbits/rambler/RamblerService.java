@@ -3,9 +3,11 @@ package nl.simbits.rambler;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Handler;
@@ -15,6 +17,8 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.lang.System;
@@ -76,6 +80,7 @@ public class RamblerService extends Service
     private boolean mVibrateOnStep;
     private boolean mVibrateOnJump;
     private Notification mNotification;
+    private Point mScreenSize;
     
     void startInForeground()
     {
@@ -116,6 +121,11 @@ public class RamblerService extends Service
         mShoeConnector = new RamblerShoeConnector(this, mJumpStepDetector);
         
         mHandler.sendMessageDelayed(mHandler.obtainMessage(SHOE_POST_STEPS), STEP_POST_DELAY);
+
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        mScreenSize = new Point();
+        display.getSize(mScreenSize);
     }
 
     @Override
@@ -381,8 +391,7 @@ public class RamblerService extends Service
                         /* post twitter message */
                        if (mLastBestLocation != null) {
 
-                           String tweet = new Formatter().format("%ts: I completed %d steps here!", 
-                                                                 System.currentTimeMillis(),
+                           String tweet = new Formatter().format("I completed %d steps here!",
                                                                  mStepsWalked).out().toString();
 
                            try {
@@ -390,7 +399,7 @@ public class RamblerService extends Service
                                        mLastBestLocation.getLatitude(),
                                        mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
-                                       tweet, mLastBestLocation));
+                                       tweet, mLastBestLocation, null));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            }        
@@ -417,6 +426,15 @@ public class RamblerService extends Service
                                                           mLastBestLocation.getLongitude())
                                                   .out()
                                                   .toString();
+
+                   String mapURLFormatBig = "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%.5f,%.5f&fov=90&heading=0&pitch=0&sensor=true";
+                   String mapURLBig = new Formatter().format(mapURLFormatBig,
+                           mScreenSize.x,
+                           mScreenSize.y,
+                           mLastBestLocation.getLatitude(),
+                           mLastBestLocation.getLongitude())
+                           .out()
+                           .toString();
 
                    String addr = mLastBestLocation.getAddressLine().toString();
                    if (addr.equals("")) {
@@ -461,7 +479,7 @@ public class RamblerService extends Service
                                mFacebook.postPhoto("Just arrived at " + addr, mapURL, true);
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.FACEBOOK,
                                        "Posted photo of the current location " + addr,
-                                       mLastBestLocation));
+                                       null, mapURLBig));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting to facebook: " + e.getMessage());
                            }
@@ -471,7 +489,7 @@ public class RamblerService extends Service
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
-                                       tweet, mLastBestLocation));
+                                       tweet, mLastBestLocation, null));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            } 
@@ -484,7 +502,7 @@ public class RamblerService extends Service
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
-                                       "Posted location on Twitter", mLastBestLocation));
+                                       "Posted location on Twitter", mLastBestLocation, null));
                            } catch (Exception e) {
                                Log.e(TAG, "Failed posting tweet: " + e.getMessage());
                            } 
