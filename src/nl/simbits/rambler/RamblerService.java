@@ -79,6 +79,7 @@ public class RamblerService extends Service
     private int mStepsWalked = 0;
     private boolean mVibrateOnStep;
     private boolean mVibrateOnJump;
+    private String mHashTag;
     private Notification mNotification;
     private Point mScreenSize;
     
@@ -117,6 +118,7 @@ public class RamblerService extends Service
         mPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mPreferenceListener = new PreferencesChangedListener();
         mPreferences.registerOnSharedPreferenceChangeListener(mPreferenceListener);
+        mHashTag = mPreferences.getString("HashTag", "");
         rambler.setService(this);
        
         mJumpStepDetector = createSGJumpStepDetector(mPreferences, new ShoeEventListener(mHandler));
@@ -409,6 +411,10 @@ public class RamblerService extends Service
                            String tweet = new Formatter().format("I completed %d steps here!",
                                                                  mStepsWalked).out().toString();
 
+                           if (mHashTag.length() > 0) {
+                               tweet += " #" + mHashTag;
+                           }
+
                            try {
                                TwitterUtilities.sendTweetAsync(tweet,
                                        mLastBestLocation.getLatitude(),
@@ -502,6 +508,9 @@ public class RamblerService extends Service
                            }
                            try {
                                String tweet = "Just arrived at " + addr;
+                               if (mHashTag.length() > 0) {
+                                   tweet += " #" + mHashTag;
+                               }
                                TwitterUtilities.sendTweetAsync(tweet + ": " + mapURL,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
@@ -514,8 +523,11 @@ public class RamblerService extends Service
                        case 1:
                         Log.i(TAG, "Received 1 jump");
                            try {
-                               TwitterUtilities.sendTweetAsync(
-                                       "I am here: " + mapURL,
+                               String tweet = "I am here: " + mapURL;
+                               if (mHashTag.length() > 0) {
+                                   tweet += " #" + mHashTag;
+                               }
+                               TwitterUtilities.sendTweetAsync(tweet,
                                                                mLastBestLocation.getLatitude(), 
                                                                mLastBestLocation.getLongitude());
                                EventAdapter.getInstance().addItem(new Event(Event.EventType.TWITTER,
@@ -594,7 +606,9 @@ public class RamblerService extends Service
 			} else if ("SDVibrateOnJump".equals(key)) {
 				mVibrateOnJump = sharedPreferences.getBoolean("SDVibrateOnJump", false);
 				Log.d(TAG, "Set vibrate on jump: " + mVibrateOnJump);
-			}
+			} else if ("HashTag".equals(key)) {
+                mHashTag = sharedPreferences.getString("HashTag", "");
+            }
 		}	
 	}
 	

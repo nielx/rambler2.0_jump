@@ -36,4 +36,15 @@
             android:title="Vibrate on jump"
             android:key="SDVibrateOnJump" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Social"
+        android:key="rambler_social">
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="HashTag"
+            android:title="Add hash tag"
+            android:summary="Enter a hash tag without the hash sign (#). Leave empty if you do not want to add a hash tag to the tweets"/>
+    </PreferenceCategory>
 </PreferenceScreen>
