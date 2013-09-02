@@ -141,12 +141,15 @@ public class EventAdapter extends BaseAdapter {
         TextView date = (TextView) currentView.findViewById(R.id.event_date);
         date.setText(mItems.get(position).getDate().toLocaleString());
 
+        ImageView picture = (ImageView) currentView.findViewById(R.id.event_picture);
         // If there is a picture, show it
         if (mItems.get(position).getPicture() != null) {
-            ImageView picture = (ImageView) currentView.findViewById(R.id.event_picture);
             picture.setVisibility(View.VISIBLE);
             picture.setAdjustViewBounds(true);
             picture.setImageBitmap(mItems.get(position).getPicture());
+        } else {
+            // The listview reuses old listitems so prevent that unintended images turn up
+            picture.setVisibility(View.GONE);
         }
 
         return currentView;
