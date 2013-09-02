@@ -559,16 +559,16 @@ public class RamblerService extends Service
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 			Log.d(TAG, "on shared prefereneces changed: " + key);
 			if ("SGPosThreshold".equals(key) || "SGNegThreshold".equals(key)) {
-				int pos = sharedPreferences.getInt("SGPosThreshold", 30);
-				int neg = sharedPreferences.getInt("SGPosThreshold", -30);
+                int pos = Integer.valueOf(sharedPreferences.getString("SGPosThreshold", "30"));
+                int neg = Integer.valueOf(sharedPreferences.getString("SGPosThreshold", "-30"));
 				Log.d(TAG, "Set SG Thresholds: " + pos + ", " + neg);
 				mJumpStepDetector.setPeakThresholds(pos, neg);
 			} else if ("SGJumpEventWindow".equals(key)) {
-				int window = sharedPreferences.getInt("SGJumpEventWindow", 1000);
+				int window = Integer.valueOf(sharedPreferences.getString("SGJumpEventWindow", "1000"));
 				Log.d(TAG, "Set SG Jump Event Window: " + window);
 				mJumpStepDetector.setJumpEventWindow(window);
 			} else if ("SGJumpInterval".equals(key)) {
-				int interval = sharedPreferences.getInt("SGJumpInterval", 3000);
+				int interval = Integer.valueOf(sharedPreferences.getString("SGJumpInterval", "3000"));
 				Log.d(TAG, "Set SG Jump Interval: " + interval);
 				mJumpStepDetector.setJumpInterval(interval);
 			} else if ("SDVibrateOnStep".equals(key)) {
