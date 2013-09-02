@@ -88,9 +88,11 @@ public class RamblerService extends Service
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
 
-        mNotification = new Notification(R.drawable.icon, "Rambler service", System.currentTimeMillis());
+        mNotification = new Notification(R.drawable.icon,
+                getResources().getString(R.string.service_name), System.currentTimeMillis());
         mNotification.flags |= Notification.FLAG_NO_CLEAR;
-        mNotification.setLatestEventInfo(this, "Rambler", "Listening for steps", pi);
+        mNotification.setLatestEventInfo(this, getResources().getText(R.string.app_name),
+                "Listening for steps", pi);
 
         startForeground(9999, mNotification);
     }
@@ -383,15 +385,23 @@ public class RamblerService extends Service
                case SHOE_CONNECTION_STATE:
                    switch(msg.arg1) {
                        case BluetoothSPPConnector.BT_CONNECTED:
-                            Toast.makeText(getApplicationContext(), "Rambler connected to shoe", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),
+                                    getResources().getText(R.string.service_connected_to_shoe),
+                                    Toast.LENGTH_SHORT).show();
                             break;
                        default:
-                            Toast.makeText(getApplicationContext(), "Rambler bluetooth  " + BluetoothSPPConnector.stateToString(msg.arg1), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),
+                                    getResources().getText(R.string.app_name) +
+                                            " bluetooth  " +
+                                            BluetoothSPPConnector.stateToString(msg.arg1),
+                                    Toast.LENGTH_SHORT).show();
                             break;
                    }
                    break;
                case SHOE_POST_STEPS:
-                   Toast.makeText(getApplicationContext(), "Rambler posting steps", Toast.LENGTH_SHORT).show();
+                   Toast.makeText(getApplicationContext(),
+                           getResources().getText(R.string.service_posting_steps),
+                           Toast.LENGTH_SHORT).show();
                    if (mStepsWalked > 0) {
                         /* post twitter message */
                        if (mLastBestLocation != null) {
@@ -418,7 +428,9 @@ public class RamblerService extends Service
                    break;
                case SHOE_RECEIVED_JUMPS: 
                    Log.d(TAG, "Rambler received jumps: " + msg.arg1);
-                   Toast.makeText(getApplicationContext(), "Rambler received jumps: " + msg.arg1, Toast.LENGTH_SHORT).show();
+                   Toast.makeText(getApplicationContext(),
+                           "" + getResources().getText(R.string.service_received_jumps) + msg.arg1,
+                           Toast.LENGTH_SHORT).show();
 
                    if (mLastBestLocation == null) {
                 	   Log.i(TAG, "No location yet");

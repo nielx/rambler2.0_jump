@@ -115,7 +115,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="Trying to connect to Rambler"
+                android:text="Trying to connect to the shoe"
                 android:textStyle="italic"
                 android:freezesText="true"/>
 

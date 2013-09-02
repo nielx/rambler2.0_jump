@@ -245,7 +245,7 @@ public class MainActivity extends Activity {
 
         if (item.getItemId() == R.id.item_exit) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Stop Rambler");
+            builder.setTitle(getResources().getText(R.string.title_stop_app));
             builder.setMessage("Are you sure you want disconnect form the shoe and stop listening for steps?");
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override

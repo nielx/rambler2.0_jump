@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Rambler</string>
 
-    <string name="titlePrefs">Preferences</string>
-    <string name="titleUsername">Username</string>
-    <string name="summaryUsername">Twitter username</string>
+    <!-- Application name references -->
+    <string name="app_name">Jump!</string>
+    <string name="service_name">Jump! Service</string>
+    <string name="service_connected_to_shoe">Jump! connected to shoe</string>
+    <string name="service_posting_steps">Jump! posting steps</string>
+    <string name="service_received_jumps">Jump! received jumps: </string>
+    <string name="title_stop_app">Stop Jump!</string>
+
 
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
