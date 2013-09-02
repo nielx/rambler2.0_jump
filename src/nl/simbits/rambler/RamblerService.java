@@ -124,8 +124,13 @@ public class RamblerService extends Service
 
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
-        mScreenSize = new Point();
-        display.getSize(mScreenSize);
+        // In some cases the display is not returned
+        if (display != null) {
+            mScreenSize = new Point();
+            display.getSize(mScreenSize);
+        } else {
+            mScreenSize = new Point(640, 480);
+        }
     }
 
     @Override
